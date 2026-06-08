@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>15-0-0-CL</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap');
+  :root{--bg:#080d1a;--surface:#0e1628;--card:#131d35;--border:#1e2e52;--accent:#2563eb;--accent2:#3b82f6;--gold:#f59e0b;--text:#e8edf8;--muted:#6b7fa8;--pd:#1a3d2b;--pl:#1e4730;--pline:rgba(255,255,255,0.25);--red:#ef4444;--green:#22c55e;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(1px 1px at 20% 15%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(1px 1px at 80% 25%,rgba(255,255,255,.3) 0%,transparent 100%),radial-gradient(1px 1px at 45% 60%,rgba(255,255,255,.25) 0%,transparent 100%),radial-gradient(1px 1px at 70% 80%,rgba(255,255,255,.3) 0%,transparent 100%),radial-gradient(2px 2px at 15% 50%,rgba(255,255,255,.15) 0%,transparent 100%),radial-gradient(2px 2px at 75% 55%,rgba(255,255,255,.1) 0%,transparent 100%);}
+  .app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 0 60px;}
+  .hdr{text-align:center;padding:22px 20px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(37,99,235,.08) 0%,transparent 100%);}
+  .hdr-stars{font-size:10px;letter-spacing:6px;color:var(--gold);margin-bottom:5px;}
+  .hdr h1{font-family:"Bebas Neue",cursive;font-size:34px;letter-spacing:3px;background:linear-gradient(135deg,#fff 0%,#93c5fd 50%,#2563eb 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+  .hdr-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+  .hdr-ctrl{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;}
+  .tog-wrap{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+  .tog{position:relative;width:36px;height:19px;cursor:pointer;}
+  .tog input{opacity:0;width:0;height:0;}
+  .tog-sl{position:absolute;inset:0;background:var(--border);border-radius:20px;transition:background .2s;}
+  .tog-sl::before{content:"";position:absolute;width:13px;height:13px;left:3px;top:3px;background:white;border-radius:50%;transition:transform .2s;}
+  .tog input:checked+.tog-sl{background:var(--accent);}
+  .tog input:checked+.tog-sl::before{transform:translateX(17px);}
+  .roll-wrap{margin:12px 14px 0;}
+  .btn-roll{width:100%;padding:16px;background:linear-gradient(135deg,#1d4ed8,#2563eb);border:none;border-radius:10px;color:white;font-family:"Bebas Neue",cursive;font-size:21px;letter-spacing:3px;cursor:pointer;transition:all .2s;box-shadow:0 4px 18px rgba(37,99,235,.4);display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn-roll:hover:not(:disabled){transform:translateY(-1px);}
+  .btn-roll:disabled{background:#1e2e52;box-shadow:none;cursor:not-allowed;opacity:.5;}
+  .sm-wrap{margin:10px 14px 0;}
+  .sm{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative;}
+  .sm::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--gold));}
+  .sm-reels{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);}
+  .sm-reel{background:var(--card);height:80px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+  .sm-lbl{position:absolute;top:7px;left:12px;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;font-weight:700;z-index:2;}
+  .sm-track{display:flex;flex-direction:column;align-items:center;width:100%;}
+  .sm-track.spin{animation:reel .04s linear infinite;}
+  @keyframes reel{0%{transform:translateY(0)}100%{transform:translateY(-60px)}}
+  .sm-item{min-height:60px;display:flex;align-items:center;justify-content:center;padding:6px 10px;text-align:center;width:100%;flex-shrink:0;}
+  .sm-club{font-family:"Bebas Neue",cursive;font-size:21px;letter-spacing:1px;color:white;line-height:1.1;text-align:center;}
+  .sm-era{font-family:"Bebas Neue",cursive;font-size:25px;letter-spacing:2px;color:var(--gold);line-height:1;}
+  .sm-overlay{position:absolute;inset:0;background:linear-gradient(180deg,var(--card) 0%,transparent 35%,transparent 65%,var(--card) 100%);pointer-events:none;z-index:1;}
+  .sm-hint{padding:8px 14px 0;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;font-weight:600;}
+  .sm-btns{padding:8px 14px 12px;display:flex;gap:8px;}
+  .btn-rr{flex:1;padding:10px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+  .btn-rr:hover:not(:disabled){border-color:var(--accent2);color:var(--accent2);}
+  .btn-rr:disabled{opacity:.3;cursor:not-allowed;}
+  .pick-wrap{margin:10px 14px 0;}
+  .pick-lbl{font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:8px;}
+  .pos-filter{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+  .pos-btn{padding:3px 9px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .15s;}
+  .pos-btn.active{border-color:var(--accent2);color:var(--accent2);background:rgba(37,99,235,.1);}
+  .plist{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow-y:auto;max-height:252px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+  .plist::-webkit-scrollbar{width:4px;}
+  .plist::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .pi{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;gap:10px;}
+  .pi:last-child{border-bottom:none;}
+  .pi:hover{background:rgba(37,99,235,.1);}
+  .pi.grey{opacity:.25;cursor:not-allowed;pointer-events:none;}
+  .pi-num{font-family:"Bebas Neue",cursive;font-size:15px;color:var(--muted);width:22px;text-align:right;flex-shrink:0;}
+  .pi-name{flex:1;font-size:14px;font-weight:600;color:var(--text);}
+  .pi-pos{display:flex;gap:3px;flex-shrink:0;}
+  .pt{font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--border);padding:2px 5px;border-radius:3px;}
+  .pi-rat{font-family:"Bebas Neue",cursive;font-size:17px;color:var(--muted);width:26px;text-align:right;flex-shrink:0;}
+  .pi-rat.hr{color:transparent;background:rgba(255,255,255,.07);border-radius:3px;user-select:none;}
+  .pitch-wrap{padding:10px 14px 0;}
+  .pitch{position:relative;width:100%;padding-bottom:130%;background:linear-gradient(180deg,var(--pd) 0%,var(--pl) 25%,var(--pd) 50%,var(--pl) 75%,var(--pd) 100%);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.07);box-shadow:0 0 30px rgba(37,99,235,.12),inset 0 0 50px rgba(0,0,0,.3);}
+  .pitch::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,transparent 17%,var(--pline) 17.5%,transparent 18%),linear-gradient(transparent calc(50% - .5px),var(--pline) 50%,transparent calc(50% + .5px)),radial-gradient(circle at 50% 50%,var(--pline) .6%,transparent .7%);}
+  .p-tbox{position:absolute;top:4%;left:23%;width:54%;height:18%;border:1px solid var(--pline);border-top:none;}
+  .p-tsix{position:absolute;top:4%;left:34%;width:32%;height:7%;border:1px solid var(--pline);border-top:none;}
+  .p-bbox{position:absolute;bottom:4%;left:23%;width:54%;height:18%;border:1px solid var(--pline);border-bottom:none;}
+  .p-bsix{position:absolute;bottom:4%;left:34%;width:32%;height:7%;border:1px solid var(--pline);border-bottom:none;}
+  .slot{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:3px;z-index:2;}
+  .sc{width:40px;height:40px;border-radius:50%;border:2px dashed rgba(255,255,255,.3);background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-family:"Bebas Neue",cursive;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.4);transition:all .25s;}
+  .slot.filled .sc{border:2px solid var(--accent2);background:rgba(37,99,235,.28);color:white;font-size:8px;letter-spacing:.5px;text-align:center;line-height:1.2;padding:3px;box-shadow:0 0 12px rgba(59,130,246,.5);}
+  .sl{font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.3);text-transform:uppercase;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.9);}
+  .slot.filled .sl{color:rgba(255,255,255,.55);}
+  .bscore{margin:10px 14px 0;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;}
+  .bscore-ttl{font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:8px;}
+  .bscore-row{display:flex;gap:14px;align-items:center;}
+  .bss{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--muted);}
+  .bss .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);}
+  .bss.on{color:var(--text);}
+  .bss.on .dot{background:var(--accent2);}
+  .trb{margin:10px 14px 0;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+  .trb-lbl{font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:7px;}
+  .trb-row{display:flex;align-items:center;gap:10px;}
+  .trb-bw{flex:1;background:rgba(255,255,255,.06);border-radius:4px;height:5px;overflow:hidden;}
+  .trb-b{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .5s ease;}
+  .trb-v{font-family:"Bebas Neue",cursive;font-size:20px;color:white;}
+  .trb-v.hr{color:transparent;background:rgba(255,255,255,.08);border-radius:4px;padding:0 8px;user-select:none;}
+  .btn-sim{width:100%;padding:16px;background:linear-gradient(135deg,#065f46,#059669);border:none;border-radius:10px;color:white;font-family:"Bebas Neue",cursive;font-size:20px;letter-spacing:3px;cursor:pointer;transition:all .2s;box-shadow:0 4px 18px rgba(5,150,105,.3);}
+  .btn-sim:hover{transform:translateY(-1px);}
+  .pp-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:flex;align-items:flex-end;justify-content:center;padding:16px;}
+  .pp-sheet{background:var(--card);border:1px solid var(--border);border-radius:16px 16px 12px 12px;width:100%;max-width:440px;overflow:hidden;}
+  .pp-hdr{padding:14px 18px;border-bottom:1px solid var(--border);background:rgba(37,99,235,.1);position:relative;}
+  .pp-title{font-family:"Bebas Neue",cursive;font-size:20px;letter-spacing:2px;}
+  .pp-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+  .pp-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:4px;}
+  .pp-slots{padding:12px 14px;display:flex;flex-direction:column;gap:7px;}
+  .pp-slot{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;color:var(--text);width:100%;font-size:13px;font-weight:600;}
+  .pp-slot:hover{border-color:var(--accent2);background:rgba(37,99,235,.12);}
+  .pp-slot-l{display:flex;align-items:center;gap:10px;}
+  .pp-badge{font-family:"Bebas Neue",cursive;font-size:15px;letter-spacing:1px;color:var(--accent2);width:32px;}
+  .sim-sec{margin:14px;}
+  .sim-hdr{text-align:center;padding:16px 0 8px;}
+  .sim-rl{font-family:"Bebas Neue",cursive;font-size:26px;letter-spacing:3px;color:var(--gold);margin-bottom:3px;}
+  .sim-vs{font-size:12px;color:var(--muted);margin-bottom:12px;}
+  .sim-sb{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+  .sim-sr{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:18px 14px;gap:10px;}
+  .sim-tn{font-size:13px;font-weight:700;}
+  .sim-tn.us{text-align:left;color:var(--accent2);}
+  .sim-tn.them{text-align:right;color:var(--muted);}
+  .sim-sc{font-family:"Bebas Neue",cursive;font-size:48px;letter-spacing:4px;text-align:center;color:white;line-height:1;min-width:100px;}
+  .sim-sc.win{color:var(--green);}
+  .sim-sc.loss{color:var(--red);}
+  .sim-sc.draw{color:var(--gold);}
+  .sim-agg{border-top:1px solid var(--border);display:flex;justify-content:center;gap:8px;padding:8px 14px;font-size:11px;color:var(--muted);font-weight:600;letter-spacing:1px;align-items:center;}
+  .agg-v{color:var(--text);font-family:"Bebas Neue",cursive;font-size:15px;}
+  .sim-ev{border-top:1px solid var(--border);max-height:180px;overflow-y:auto;scrollbar-width:thin;}
+  .ev{display:flex;align-items:center;padding:7px 14px;border-bottom:1px solid rgba(255,255,255,.04);gap:8px;font-size:12px;}
+  .ev-min{font-family:"Bebas Neue",cursive;font-size:13px;color:var(--muted);width:30px;flex-shrink:0;}
+  .ev-ico{font-size:13px;flex-shrink:0;}
+  .ev-txt{flex:1;color:var(--text);}
+  .ev-txt.them{color:var(--muted);}
+  .sim-nxt{width:100%;padding:15px;background:linear-gradient(135deg,#1d4ed8,#2563eb);border:none;border-radius:10px;color:white;font-family:"Bebas Neue",cursive;font-size:19px;letter-spacing:3px;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(37,99,235,.35);}
+  .sim-nxt:hover{transform:translateY(-1px);}
+  .rc{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  .rh{padding:9px 14px;background:rgba(37,99,235,.1);border-bottom:1px solid var(--border);font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:var(--accent2);display:flex;justify-content:space-between;align-items:center;}
+  .rr{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;}
+  .rt{font-size:12px;font-weight:600;color:var(--muted);}
+  .rt.us{color:var(--text);}
+  .rs{font-family:"Bebas Neue",cursive;font-size:22px;letter-spacing:2px;color:white;padding:0 10px;}
+  .rs.win{color:var(--green);}
+  .rs.loss{color:var(--red);}
+  .rs.draw{color:var(--gold);}
+  .trophy{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(37,99,235,.15));border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:26px 18px;text-align:center;margin-bottom:10px;}
+  .trophy-ico{font-size:50px;margin-bottom:10px;}
+  .trophy-ttl{font-family:"Bebas Neue",cursive;font-size:30px;letter-spacing:3px;color:var(--gold);}
+  .trophy-sub{font-size:13px;color:var(--muted);margin-top:5px;}
+  .btn-reset{width:100%;padding:14px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+  .btn-reset:hover{border-color:var(--accent2);}
+
+  .form-wrap{margin:10px 14px 0;}
+  .form-lbl{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:6px;}
+  .form-btns{display:flex;flex-wrap:wrap;gap:5px;}
+  .form-btn{padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .15s;}
+  .form-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(245,158,11,.08);}
+  .form-btn:disabled{cursor:not-allowed;}
+  .kofi-link{display:inline-block;margin-top:8px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:600;color:var(--muted);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:20px;transition:all .2s;}
+  .kofi-link:hover{color:var(--gold);border-color:var(--gold);}
+
+  .confetti-piece{position:fixed;width:8px;height:8px;top:-10px;opacity:0;animation:confetti-fall linear forwards;z-index:999;pointer-events:none;border-radius:2px;}
+  @keyframes confetti-fall{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(100vh) rotate(720deg);}}
+
+  .squad-list-wrap{margin:10px 14px 0;}
+  .sq-row{display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);gap:10px;}
+  .sq-row:last-child{border-bottom:none;}
+  .sq-pos{font-family:"Bebas Neue",cursive;font-size:13px;color:var(--accent2);width:28px;flex-shrink:0;}
+  .sq-name{flex:1;font-size:14px;font-weight:600;color:var(--text);}
+  .sq-club{font-size:10px;color:var(--muted);flex-shrink:0;text-align:right;max-width:130px;}
+  .sq-rat{font-family:"Bebas Neue",cursive;font-size:18px;color:var(--text);width:28px;text-align:right;flex-shrink:0;}
+  .hidden{display:none!important;}
+  .fadein{animation:fi .25s ease;}
+  @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr">
+  <div class="hdr-stars">&#9733; &#9733; &#9733; &#9733; &#9733;</div>
+  <h1>15-0-0-CL</h1>
+  <div class="hdr-sub">Champions League XI Builder</div>
+  <div class="hdr-ctrl"><div class="tog-wrap">Hide Ratings<label class="tog"><input type="checkbox" id="tog-hide" checked><span class="tog-sl"></span></label></div></div>
+</div>
+<div id="phase-build">
+  <div class="roll-wrap"><button class="btn-roll" id="btn-roll">ROLL &#127922;</button></div>
+  <div class="form-wrap" id="form-wrap">
+    <div class="form-lbl">Formation</div>
+    <div class="form-btns" id="formation-wrap"></div>
+  </div>
+  <div class="sm-wrap hidden" id="sm-wrap">
+    <div class="sm">
+      <div class="sm-reels">
+        <div class="sm-reel"><div class="sm-lbl">Club</div><div class="sm-overlay"></div><div class="sm-track" id="sm-ct"><div class="sm-item"><div class="sm-club" id="sm-cv">-</div></div></div></div>
+        <div class="sm-reel"><div class="sm-lbl">Era</div><div class="sm-overlay"></div><div class="sm-track" id="sm-et"><div class="sm-item"><div class="sm-era" id="sm-ev">-</div></div></div></div>
+      </div>
+      <div class="sm-hint">NOT FEELING IT? RE-ROLL &middot; <span id="rr-left">2</span> LEFT</div>
+      <div class="sm-btns"><button class="btn-rr" id="btn-rrc" disabled>&#8635; Another Club</button><button class="btn-rr" id="btn-rre" disabled>&#8635; Another Era</button></div>
+    </div>
+  </div>
+  <div class="pick-wrap hidden" id="pick-wrap">
+    <div class="pick-lbl">Pick a Player</div>
+    <div class="pos-filter" id="pos-filter"></div>
+    <div class="plist" id="plist"></div>
+  </div>
+  <div class="pitch-wrap"><div class="pitch" id="pitch"><div class="p-tbox"></div><div class="p-tsix"></div><div class="p-bbox"></div><div class="p-bsix"></div></div></div>
+  <div class="bscore"><div class="bscore-ttl">Squad &middot; <span id="picks-cnt">0</span>/11</div><div class="bscore-row"><div class="bss" id="bs-atk"><div class="dot"></div> Attack</div><div class="bss" id="bs-def"><div class="dot"></div> Defense</div><div class="bss" id="bs-mid"><div class="dot"></div> Midfield</div></div></div>
+  <div class="hidden" id="squad-list-wrap">
+  <div style="margin:10px 14px 0;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+    <div style="padding:8px 14px;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--border);">Your XI</div>
+    <div id="squad-list"></div>
+  </div>
+</div>
+<div id="sim-ready" class="hidden">
+    <div class="trb"><div class="trb-lbl">Squad Overall Rating</div><div class="trb-row"><div class="trb-bw"><div class="trb-b" id="trb-bar" style="width:0%"></div></div><div class="trb-v" id="trb-val">-</div></div></div>
+    <div class="roll-wrap"><button class="btn-sim" id="btn-sim">&#9917; SIMULATE CHAMPIONS LEAGUE</button></div>
+  </div>
+</div>
+<div id="phase-sim" class="hidden">
+  <div class="sim-sec">
+    <div class="sim-hdr"><div class="sim-rl" id="sim-rl">League Phase</div><div class="sim-vs" id="sim-vs">Game 1 of 8</div></div>
+    <div class="sim-sb">
+      <div class="sim-sr"><div class="sim-tn us">Your XI</div><div class="sim-sc draw" id="sim-sc">0 - 0</div><div class="sim-tn them" id="sim-opp">Opponent</div></div>
+      <div class="sim-agg hidden" id="sim-agg">Aggregate: <span class="agg-v" id="sim-agg-v">0 - 0</span></div>
+      <div class="sim-ev" id="sim-ev"></div>
+    </div>
+    <button class="sim-nxt hidden" id="sim-nxt">NEXT GAME &rarr;</button>
+  </div>
+</div>
+<div id="phase-res" class="hidden">
+  <div class="sim-sec" id="res-content"></div>
+  <div style="margin:0 14px 14px;"><button class="btn-reset" id="btn-reset">&#8635; Play Again</button></div>
+</div>
+<div class="pp-ov hidden" id="pp-ov">
+  <div class="pp-sheet">
+    <div class="pp-hdr"><div class="pp-title" id="pp-name">Player</div><div class="pp-sub" id="pp-info">Club</div><button class="pp-close" id="pp-close">&#10005;</button></div>
+    <div class="pp-slots" id="pp-slots"></div>
+  </div>
+</div>
+<div id="cl-trophy-tpl" style="display:none"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 140" width="80" height="112"><defs><linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#f8d76b"/><stop offset="40%" style="stop-color:#f5c518"/><stop offset="70%" style="stop-color:#c9960c"/><stop offset="100%" style="stop-color:#f8d76b"/></linearGradient><linearGradient id="sg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#f8d76b"/><stop offset="100%" style="stop-color:#a07800"/></linearGradient></defs><rect x="25" y="128" width="50" height="8" rx="3" fill="url(#tg)"/><rect x="42" y="108" width="16" height="22" rx="2" fill="url(#sg)"/><ellipse cx="50" cy="110" rx="18" ry="5" fill="url(#tg)"/><path d="M28 30 Q24 70 34 90 Q42 108 50 108 Q58 108 66 90 Q76 70 72 30 Z" fill="url(#tg)"/><path d="M33 32 Q30 65 38 85 Q44 100 50 102 Q56 100 62 85 Q70 65 67 32 Z" fill="#c9960c" opacity="0.3"/><path d="M28 40 Q10 40 10 58 Q10 76 28 72" stroke="url(#tg)" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M72 40 Q90 40 90 58 Q90 76 72 72" stroke="url(#tg)" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M28 47 Q15 47 15 58 Q15 69 28 66" stroke="#a07800" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M72 47 Q85 47 85 58 Q85 69 72 66" stroke="#a07800" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="50" cy="30" rx="22" ry="7" fill="url(#tg)"/><ellipse cx="50" cy="30" rx="18" ry="4" fill="#c9960c" opacity="0.4"/><polygon points="50,52 52.5,59 60,59 54,63.5 56.5,71 50,67 43.5,71 46,63.5 40,59 47.5,59" fill="#fff" opacity="0.7"/><text x="50" y="26" text-anchor="middle" font-size="8" fill="#1a3a8f" font-family="Arial">&#9733; &#9733; &#9733;</text></svg></div>
+  <div style="text-align:center;padding:20px 0 8px;display:none;">
+    <a href="https://ko-fi.com/1500cl" target="_blank" class="kofi-link">&#9749; Support 15-0-0-CL</a>
+  </div>
+</div>
+
+<script>
+(function(){
+var SQUADS={"squads":[{"id":"real_madrid_90_94","club":"Real Madrid","era":"1990-94","rating":82,"players":[{"name":"Buyo","pos":["GK"],"rating":78},{"name":"Sanch\u00eds","pos":["CB"],"rating":79},{"name":"Hierro","pos":["CB","CM"],"rating":85},{"name":"M\u00edchel Salgado","pos":["RB"],"rating":76},{"name":"Chendo","pos":["RB"],"rating":74},{"name":"Mart\u00edn V\u00e1zquez","pos":["CM"],"rating":80},{"name":"M\u00edchel","pos":["CM","RM"],"rating":81},{"name":"Laudrup","pos":["RM","RW"],"rating":86},{"name":"Hugo S\u00e1nchez","pos":["ST"],"rating":85},{"name":"Butrague\u00f1o","pos":["ST"],"rating":83},{"name":"Zamorano","pos":["ST"],"rating":82},{"name":"Gordillo","pos":["LM","LW"],"rating":77},{"name":"Llorente","pos":["CB","LB"],"rating":75},{"name":"Amavisca","pos":["RW","RM"],"rating":76},{"name":"Gonz\u00e1lez","pos":["GK"],"rating":72},{"name":"Paco Llorente","pos":["CM"],"rating":73},{"name":"Galca","pos":["CM"],"rating":74},{"name":"Davor \u0160uker","pos":["ST"],"rating":84}]},{"id":"barcelona_90_94","club":"Barcelona","era":"1990-94","rating":88,"players":[{"name":"Zubizarreta","pos":["GK"],"rating":84},{"name":"Andoni Zubizarreta","pos":["GK"],"rating":84},{"name":"Koeman","pos":["CB","CM"],"rating":87},{"name":"Nando","pos":["CB"],"rating":75},{"name":"Sergi","pos":["LB","LM"],"rating":77},{"name":"Ferrer","pos":["RB"],"rating":78},{"name":"Guardiola","pos":["CM"],"rating":84},{"name":"Bakero","pos":["CM"],"rating":80},{"name":"Laudrup (Michael)","pos":["RM","RW"],"rating":88},{"name":"Stoichkov","pos":["LW","ST"],"rating":90},{"name":"Rom\u00e1rio","pos":["ST"],"rating":92},{"name":"Goikoetxea","pos":["CB","LB"],"rating":76},{"name":"Eusebio","pos":["CM","LM"],"rating":78},{"name":"Begiristain","pos":["LW","LM"],"rating":80},{"name":"Amor","pos":["CM"],"rating":77},{"name":"Salinas","pos":["ST","RW"],"rating":79},{"name":"Nadal","pos":["CB"],"rating":75},{"name":"Lopetegui","pos":["GK"],"rating":71}]},{"id":"bayern_munich_90_94","club":"Bayern Munich","era":"1990-94","rating":83,"players":[{"name":"Raimond Aumann","pos":["GK"],"rating":80},{"name":"Oliver Kahn","pos":["GK"],"rating":82},{"name":"Klaus Augenthaler","pos":["CB","LB"],"rating":79},{"name":"Thomas Helmer","pos":["CB"],"rating":80},{"name":"Lothar Matth\u00e4us","pos":["CM","CB"],"rating":91},{"name":"Stefan Effenberg","pos":["CM"],"rating":84},{"name":"Thomas Strunz","pos":["CM"],"rating":76},{"name":"Christian Ziege","pos":["LB","LM"],"rating":79},{"name":"J\u00fcrgen Klinsmann","pos":["ST"],"rating":86},{"name":"Roland Wohlfarth","pos":["ST"],"rating":78},{"name":"Jean-Pierre Papin","pos":["ST"],"rating":87},{"name":"Mehmet Scholl","pos":["CM","RM","LM"],"rating":82},{"name":"Adolfo Valencia","pos":["RW","ST","LW"],"rating":77},{"name":"Thomas Strunz","pos":["CM"],"rating":76},{"name":"Markus Babbel","pos":["RB"],"rating":77},{"name":"Bernd Dreher","pos":["GK"],"rating":72},{"name":"Dietmar Hamann","pos":["CM"],"rating":78},{"name":"Niko Kova\u010d","pos":["CM"],"rating":74}]},{"id":"juventus_90_94","club":"Juventus","era":"1990-94","rating":85,"players":[{"name":"Peruzzi","pos":["GK"],"rating":82},{"name":"Tacconi","pos":["GK"],"rating":78},{"name":"Maldini","pos":["LB","CB"],"rating":88},{"name":"Ferrara","pos":["CB"],"rating":83},{"name":"Torricelli","pos":["RB"],"rating":77},{"name":"Kohler","pos":["CB"],"rating":84},{"name":"Deschamps","pos":["CM"],"rating":83},{"name":"Conte","pos":["CM"],"rating":79},{"name":"Roberto Baggio","pos":["ST","RW"],"rating":92},{"name":"Vialli","pos":["ST"],"rating":86},{"name":"Ravanelli","pos":["ST","RW"],"rating":81},{"name":"Casiraghi","pos":["ST"],"rating":79},{"name":"Dino Baggio","pos":["CM","LM","LW"],"rating":80},{"name":"Marocchi","pos":["CM"],"rating":76},{"name":"Porrini","pos":["RB","CB"],"rating":75},{"name":"M\u00f6ller","pos":["CM","RM"],"rating":82},{"name":"Zavarov","pos":["CM","LM"],"rating":78},{"name":"Sousa","pos":["CM"],"rating":76}]},{"id":"ac_milan_90_94","club":"AC Milan","era":"1990-94","rating":90,"players":[{"name":"Sebastiano Rossi","pos":["GK"],"rating":82},{"name":"Sivori","pos":["GK"],"rating":74},{"name":"Maldini","pos":["LB","CB"],"rating":92},{"name":"Costacurta","pos":["CB"],"rating":88},{"name":"Baresi","pos":["CB"],"rating":94},{"name":"Tassotti","pos":["RB","CB"],"rating":82},{"name":"Desailly","pos":["CM","CB"],"rating":85},{"name":"Albertini","pos":["CM"],"rating":84},{"name":"Donadoni","pos":["CM","RM"],"rating":81},{"name":"Savicevic","pos":["RW","ST"],"rating":88},{"name":"Van Basten","pos":["ST"],"rating":93},{"name":"Gullit","pos":["ST","LW"],"rating":91},{"name":"Massaro","pos":["ST","RW"],"rating":80},{"name":"Boban","pos":["CM"],"rating":86},{"name":"Lentini","pos":["LW","LM"],"rating":82},{"name":"Weah","pos":["ST","LW"],"rating":87},{"name":"Evani","pos":["CM","RM"],"rating":76},{"name":"Panucci","pos":["RB"],"rating":77}]},{"id":"inter_milan_90_94","club":"Inter Milan","era":"1990-94","rating":83,"players":[{"name":"Walter Zenga","pos":["GK"],"rating":84},{"name":"Pagliuca","pos":["GK"],"rating":81},{"name":"Bergomi","pos":["CB","RB"],"rating":84},{"name":"Brehme","pos":["LB","CB"],"rating":86},{"name":"Battistini","pos":["CB"],"rating":76},{"name":"Ferri","pos":["CB","RB"],"rating":78},{"name":"Matth\u00e4us","pos":["CM"],"rating":91},{"name":"Berti","pos":["CM"],"rating":79},{"name":"Bianchi","pos":["CM"],"rating":75},{"name":"Klinsmann","pos":["ST"],"rating":86},{"name":"Sforza","pos":["CM"],"rating":77},{"name":"Jonk","pos":["CM"],"rating":79},{"name":"Sosa","pos":["LW","LM"],"rating":80},{"name":"Caniggia","pos":["ST","RW"],"rating":84},{"name":"Ruben Sosa","pos":["LW","ST"],"rating":80},{"name":"Pizzi","pos":["RW","RM"],"rating":76},{"name":"Branco","pos":["LB"],"rating":78},{"name":"Dell'Anno","pos":["GK"],"rating":70}]},{"id":"man_utd_90_94","club":"Man Utd","era":"1990-94","rating":82,"players":[{"name":"Peter Schmeichel","pos":["GK"],"rating":91},{"name":"Gary Walsh","pos":["GK"],"rating":70},{"name":"Steve Bruce","pos":["CB"],"rating":81},{"name":"Gary Pallister","pos":["CB"],"rating":83},{"name":"Denis Irwin","pos":["LB","RB"],"rating":82},{"name":"Paul Parker","pos":["RB"],"rating":77},{"name":"Bryan Robson","pos":["CM"],"rating":85},{"name":"Paul Ince","pos":["CM"],"rating":83},{"name":"Roy Keane","pos":["CM"],"rating":87},{"name":"Ryan Giggs","pos":["LW","LM"],"rating":87},{"name":"Eric Cantona","pos":["ST","RW"],"rating":91},{"name":"Mark Hughes","pos":["ST"],"rating":83},{"name":"Lee Sharpe","pos":["LW","LM"],"rating":78},{"name":"Andrei Kanchelskis","pos":["RW","RM"],"rating":82},{"name":"Brian McClair","pos":["ST","CM"],"rating":78},{"name":"Gary Neville","pos":["RB"],"rating":79},{"name":"Clayton Blackmore","pos":["LB","CB"],"rating":74},{"name":"Dion Dublin","pos":["ST"],"rating":75}]},{"id":"porto_90_94","club":"Porto","era":"1990-94","rating":79,"players":[{"name":"V\u00edtor Ba\u00eda","pos":["GK"],"rating":83},{"name":"Filipe Martins","pos":["GK"],"rating":71},{"name":"Jo\u00e3o Pinto","pos":["RB","RM"],"rating":78},{"name":"Rui Barros","pos":["CM","RM"],"rating":77},{"name":"Secret\u00e1rio","pos":["RB"],"rating":75},{"name":"Aloisio","pos":["CB"],"rating":76},{"name":"Couto","pos":["CB","LB"],"rating":79},{"name":"Ven\u00e2ncio","pos":["CB"],"rating":74},{"name":"Folha","pos":["LB"],"rating":73},{"name":"Paulo Futre","pos":["LW","ST"],"rating":84},{"name":"Domingos","pos":["ST"],"rating":76},{"name":"Oceano","pos":["CM","LM"],"rating":75},{"name":"Magalh\u00e3es","pos":["CM"],"rating":73},{"name":"Figo","pos":["RW","RM"],"rating":80},{"name":"Drulovi\u0107","pos":["CM"],"rating":74},{"name":"Andr\u00e9","pos":["ST","LW"],"rating":75},{"name":"Semedo","pos":["LB","CB"],"rating":72},{"name":"Em\u00edlio","pos":["CM"],"rating":71}]},{"id":"dortmund_90_94","club":"Borussia Dortmund","era":"1990-94","rating":80,"players":[{"name":"Stefan Klos","pos":["GK"],"rating":78},{"name":"Wolfgang de Beer","pos":["GK"],"rating":70},{"name":"Matthias Sammer","pos":["CB","CM"],"rating":88},{"name":"Michael Zorc","pos":["CM","RM"],"rating":80},{"name":"Julio Cesar","pos":["CB"],"rating":77},{"name":"Stefan Reuter","pos":["RB","CM"],"rating":80},{"name":"Andreas M\u00f6ller","pos":["CM","RM","LM"],"rating":84},{"name":"Karl-Heinz Riedle","pos":["ST"],"rating":82},{"name":"St\u00e9phane Chapuisat","pos":["ST"],"rating":83},{"name":"Martin Kree","pos":["LB"],"rating":73},{"name":"Flemming Povlsen","pos":["ST","RW"],"rating":78},{"name":"Norbert Dickel","pos":["ST"],"rating":74},{"name":"Frank Mill","pos":["ST","LW"],"rating":75},{"name":"Michael Rummenigge","pos":["RW","RM"],"rating":76},{"name":"G\u00fcnter Hermann","pos":["CB","LB"],"rating":74},{"name":"Wolfgang Feiersinger","pos":["CB"],"rating":73},{"name":"Ottmar Hitzfeld","pos":["ST"],"rating":72},{"name":"Y\u00fcksel Ye\u015filyurt","pos":["CM"],"rating":71}]},{"id":"arsenal_95_99","club":"Arsenal","era":"1995-99","rating":83,"players":[{"name":"David Seaman","pos":["GK"],"rating":86},{"name":"Alex Manninger","pos":["GK"],"rating":74},{"name":"Tony Adams","pos":["CB"],"rating":85},{"name":"Steve Bould","pos":["CB"],"rating":80},{"name":"Martin Keown","pos":["CB"],"rating":81},{"name":"Nigel Winterburn","pos":["LB"],"rating":80},{"name":"Lee Dixon","pos":["RB"],"rating":80},{"name":"Patrick Vieira","pos":["CM"],"rating":88},{"name":"Emmanuel Petit","pos":["CM"],"rating":84},{"name":"Ray Parlour","pos":["CM","RM"],"rating":78},{"name":"Marc Overmars","pos":["LW","LM"],"rating":86},{"name":"Dennis Bergkamp","pos":["ST","RW"],"rating":91},{"name":"Nicolas Anelka","pos":["ST"],"rating":84},{"name":"Ian Wright","pos":["ST"],"rating":85},{"name":"Freddie Ljungberg","pos":["CM","RM"],"rating":82},{"name":"Christopher Wreh","pos":["ST","LW"],"rating":73},{"name":"Sylvinho","pos":["LB"],"rating":77},{"name":"R\u00e9mi Garde","pos":["CM"],"rating":72}]},{"id":"real_madrid_95_99","club":"Real Madrid","era":"1995-99","rating":87,"players":[{"name":"Illgner","pos":["GK"],"rating":83},{"name":"C\u00e9sar S\u00e1nchez","pos":["GK"],"rating":79},{"name":"Hierro","pos":["CB","CM"],"rating":86},{"name":"Sanch\u00eds","pos":["CB"],"rating":80},{"name":"Roberto Carlos","pos":["LB"],"rating":91},{"name":"M\u00edchel Salgado","pos":["RB"],"rating":80},{"name":"Redondo","pos":["CM"],"rating":87},{"name":"Seedorf","pos":["CM","RM"],"rating":85},{"name":"Karanka","pos":["CB","LB"],"rating":74},{"name":"Ra\u00fal","pos":["ST","RW","LW"],"rating":90},{"name":"Morientes","pos":["ST"],"rating":84},{"name":"Suker","pos":["ST"],"rating":85},{"name":"Mijatovic","pos":["ST","RW"],"rating":82},{"name":"Panucci","pos":["RB","CB"],"rating":78},{"name":"Zidane","pos":["CM"],"rating":93},{"name":"Anelka","pos":["ST"],"rating":82},{"name":"McManaman","pos":["CM","RM","LM"],"rating":80},{"name":"Kova\u010devi\u0107","pos":["ST"],"rating":77}]},{"id":"barcelona_95_99","club":"Barcelona","era":"1995-99","rating":86,"players":[{"name":"V\u00edtor Ba\u00eda","pos":["GK"],"rating":83},{"name":"Hesp","pos":["GK"],"rating":76},{"name":"Puyol","pos":["CB","RB"],"rating":84},{"name":"Nadal","pos":["CB"],"rating":78},{"name":"Sergi","pos":["LB","LM"],"rating":79},{"name":"Ferrer","pos":["RB"],"rating":79},{"name":"Guardiola","pos":["CM"],"rating":83},{"name":"Popescu","pos":["CM","CB"],"rating":79},{"name":"Figo","pos":["RW","RM"],"rating":89},{"name":"Ronaldo","pos":["ST"],"rating":93},{"name":"Stoichkov","pos":["LW","ST"],"rating":86},{"name":"Giovanni","pos":["ST","LW"],"rating":80},{"name":"Luis Enrique","pos":["CM","ST"],"rating":81},{"name":"Cocu","pos":["CM"],"rating":81},{"name":"Rivaldo","pos":["LW","ST"],"rating":90},{"name":"De la Pe\u00f1a","pos":["CM","LM"],"rating":78},{"name":"Oscar","pos":["GK"],"rating":73},{"name":"Bogdanovi\u0107","pos":["RW"],"rating":72}]},{"id":"juventus_95_99","club":"Juventus","era":"1995-99","rating":89,"players":[{"name":"Peruzzi","pos":["GK"],"rating":84},{"name":"Rampulla","pos":["GK"],"rating":76},{"name":"Maldini","pos":["LB","CB"],"rating":90},{"name":"Ferrara","pos":["CB"],"rating":84},{"name":"Montero","pos":["CB"],"rating":83},{"name":"Torricelli","pos":["RB"],"rating":78},{"name":"Deschamps","pos":["CM"],"rating":84},{"name":"Conte","pos":["CM"],"rating":80},{"name":"Zidane","pos":["CM"],"rating":91},{"name":"Del Piero","pos":["ST","RW"],"rating":91},{"name":"Vialli","pos":["ST"],"rating":85},{"name":"Boksic","pos":["ST"],"rating":83},{"name":"Ravanelli","pos":["ST","RW"],"rating":82},{"name":"Jugovic","pos":["CM","LM","RM"],"rating":78},{"name":"Davids","pos":["CM","LW"],"rating":86},{"name":"Pessotto","pos":["LB","RB"],"rating":76},{"name":"Amoruso","pos":["CB"],"rating":77},{"name":"Birindelli","pos":["RB"],"rating":74}]},{"id":"ac_milan_95_99","club":"AC Milan","era":"1995-99","rating":84,"players":[{"name":"Sebastiano Rossi","pos":["GK"],"rating":81},{"name":"Pagliuca","pos":["GK"],"rating":80},{"name":"Maldini","pos":["LB","CB"],"rating":91},{"name":"Costacurta","pos":["CB"],"rating":85},{"name":"Baresi","pos":["CB"],"rating":89},{"name":"Tassotti","pos":["RB","CB"],"rating":79},{"name":"Boban","pos":["CM"],"rating":85},{"name":"Albertini","pos":["CM"],"rating":83},{"name":"Desailly","pos":["CM","CB"],"rating":84},{"name":"Weah","pos":["ST","LW"],"rating":88},{"name":"Savicevic","pos":["RW","ST"],"rating":85},{"name":"Bierhoff","pos":["ST"],"rating":82},{"name":"Zvonimir Boban","pos":["CM"],"rating":85},{"name":"Leonardo","pos":["LM","CM","RM"],"rating":82},{"name":"Roberto Baggio","pos":["ST","RW"],"rating":88},{"name":"Davide Simone","pos":["ST"],"rating":75},{"name":"Panucci","pos":["RB"],"rating":77},{"name":"Helveg","pos":["RB","LB"],"rating":76}]},{"id":"inter_milan_95_99","club":"Inter Milan","era":"1995-99","rating":85,"players":[{"name":"Pagliuca","pos":["GK"],"rating":82},{"name":"Frey","pos":["GK"],"rating":76},{"name":"Bergomi","pos":["CB"],"rating":82},{"name":"Colonnese","pos":["CB"],"rating":76},{"name":"Zanetti","pos":["RB","CM"],"rating":87},{"name":"Brehme","pos":["LB"],"rating":82},{"name":"Djorkaeff","pos":["CM","LM","RM"],"rating":84},{"name":"Sforza","pos":["CM"],"rating":78},{"name":"Ronaldo","pos":["ST"],"rating":95},{"name":"Zamorano","pos":["ST"],"rating":82},{"name":"Recoba","pos":["LW","ST"],"rating":83},{"name":"Ince","pos":["CM"],"rating":80},{"name":"Pirlo","pos":["CM"],"rating":79},{"name":"Cauet","pos":["CM"],"rating":77},{"name":"Fresi","pos":["CB","LB"],"rating":74},{"name":"Galante","pos":["LB","CB"],"rating":74},{"name":"Roberto Baggio","pos":["ST","RW"],"rating":86},{"name":"Winter","pos":["CM"],"rating":76}]},{"id":"man_utd_95_99","club":"Man Utd","era":"1995-99","rating":88,"players":[{"name":"Peter Schmeichel","pos":["GK"],"rating":92},{"name":"Raimond van der Gouw","pos":["GK"],"rating":72},{"name":"Gary Neville","pos":["RB"],"rating":82},{"name":"Phil Neville","pos":["LB","RB"],"rating":77},{"name":"Ronny Johnsen","pos":["CB"],"rating":79},{"name":"Gary Pallister","pos":["CB"],"rating":82},{"name":"Jaap Stam","pos":["CB"],"rating":89},{"name":"Denis Irwin","pos":["LB"],"rating":81},{"name":"Roy Keane","pos":["CM"],"rating":90},{"name":"Paul Scholes","pos":["CM"],"rating":87},{"name":"Nicky Butt","pos":["CM"],"rating":78},{"name":"Ryan Giggs","pos":["LW","LM"],"rating":88},{"name":"David Beckham","pos":["RM","CM"],"rating":87},{"name":"Andy Cole","pos":["ST"],"rating":83},{"name":"Dwight Yorke","pos":["ST"],"rating":86},{"name":"Ole Gunnar Solskj\u00e6r","pos":["ST"],"rating":82},{"name":"Teddy Sheringham","pos":["ST"],"rating":81},{"name":"Eric Cantona","pos":["ST","RW"],"rating":90}]},{"id":"liverpool_95_99","club":"Liverpool","era":"1995-99","rating":80,"players":[{"name":"David James","pos":["GK"],"rating":79},{"name":"Brad Friedel","pos":["GK"],"rating":78},{"name":"Stig Inge Bj\u00f8rnebye","pos":["LB"],"rating":76},{"name":"Jason McAteer","pos":["RB","RM"],"rating":75},{"name":"Mark Wright","pos":["CB"],"rating":78},{"name":"Neil Ruddock","pos":["CB"],"rating":76},{"name":"Dominic Matteo","pos":["LB","CB"],"rating":74},{"name":"Jamie Redknapp","pos":["CM"],"rating":80},{"name":"Michael Thomas","pos":["CM"],"rating":76},{"name":"Steve McManaman","pos":["LM","RM","LW","RW"],"rating":82},{"name":"Robbie Fowler","pos":["ST"],"rating":87},{"name":"Stan Collymore","pos":["ST"],"rating":82},{"name":"Michael Owen","pos":["ST"],"rating":86},{"name":"Patrik Berger","pos":["LM","CM"],"rating":79},{"name":"John Barnes","pos":["LM","CM"],"rating":80},{"name":"Karlheinz Riedle","pos":["ST"],"rating":78},{"name":"Paul Ince","pos":["CM"],"rating":81},{"name":"Oyvind Leonhardsen","pos":["CM","RM"],"rating":74}]},{"id":"porto_95_99","club":"Porto","era":"1995-99","rating":80,"players":[{"name":"V\u00edtor Ba\u00eda","pos":["GK"],"rating":84},{"name":"Hil\u00e1rio","pos":["GK"],"rating":73},{"name":"Jorge Costa","pos":["CB"],"rating":80},{"name":"Couto","pos":["CB","LB"],"rating":79},{"name":"Secret\u00e1rio","pos":["RB"],"rating":76},{"name":"Xavier","pos":["LB","CB"],"rating":75},{"name":"Figo","pos":["RW","RM"],"rating":88},{"name":"Rui Barros","pos":["CM","RM"],"rating":76},{"name":"Drulovi\u0107","pos":["CM"],"rating":75},{"name":"Domingos Paci\u00eancia","pos":["ST"],"rating":78},{"name":"Artur","pos":["ST","LW"],"rating":76},{"name":"Zahovi\u0107","pos":["CM","LM"],"rating":80},{"name":"Edmilson","pos":["CM","CB"],"rating":77},{"name":"Jo\u00e3o Pinto","pos":["ST","RW"],"rating":79},{"name":"Jardel","pos":["ST"],"rating":83},{"name":"Duda","pos":["LM","CM"],"rating":74},{"name":"Paulo Bento","pos":["CM"],"rating":74},{"name":"Capucho","pos":["LW","LM"],"rating":77}]},{"id":"dortmund_95_99","club":"Borussia Dortmund","era":"1995-99","rating":85,"players":[{"name":"Stefan Klos","pos":["GK"],"rating":80},{"name":"Jens Lehmann","pos":["GK"],"rating":82},{"name":"Matthias Sammer","pos":["CB","CM"],"rating":89},{"name":"J\u00falio C\u00e9sar","pos":["CB"],"rating":78},{"name":"Kohler","pos":["CB"],"rating":83},{"name":"Stefan Reuter","pos":["RB","CM"],"rating":81},{"name":"Christian W\u00f6rns","pos":["CB","LB"],"rating":79},{"name":"Andreas M\u00f6ller","pos":["CM","RM"],"rating":85},{"name":"Paulo Sousa","pos":["CM"],"rating":78},{"name":"Steffen Freund","pos":["CM"],"rating":78},{"name":"Michael Zorc","pos":["CM"],"rating":78},{"name":"Karl-Heinz Riedle","pos":["ST"],"rating":82},{"name":"St\u00e9phane Chapuisat","pos":["ST"],"rating":83},{"name":"Heiko Herrlich","pos":["ST","RW"],"rating":79},{"name":"Lars Ricken","pos":["CM","RM","LM"],"rating":78},{"name":"Ibrahim Tanko","pos":["ST","LW"],"rating":73},{"name":"J\u00f6rg Heinrich","pos":["LB"],"rating":75},{"name":"Ded\u00ea","pos":["CB"],"rating":77}]},{"id":"bayern_munich_95_99","club":"Bayern Munich","era":"1995-99","rating":86,"players":[{"name":"Oliver Kahn","pos":["GK"],"rating":88},{"name":"Bernd Dreher","pos":["GK"],"rating":72},{"name":"Thomas Helmer","pos":["CB"],"rating":80},{"name":"Lothar Matth\u00e4us","pos":["CB","CM"],"rating":87},{"name":"Markus Babbel","pos":["RB"],"rating":79},{"name":"Bixente Lizarazu","pos":["LB"],"rating":85},{"name":"Stefan Effenberg","pos":["CM"],"rating":86},{"name":"Mehmet Scholl","pos":["CM","RM","LM"],"rating":83},{"name":"Dietmar Hamann","pos":["CM"],"rating":81},{"name":"J\u00fcrgen Klinsmann","pos":["ST"],"rating":84},{"name":"Carsten Jancker","pos":["ST"],"rating":78},{"name":"Elber","pos":["ST","LW"],"rating":84},{"name":"Zickler","pos":["RW","ST"],"rating":78},{"name":"Salihamid\u017ei\u0107","pos":["CM","RM"],"rating":79},{"name":"Samuel Kuffour","pos":["CB"],"rating":79},{"name":"Michael Tarnat","pos":["LB"],"rating":77},{"name":"Patrik Andersson","pos":["CB"],"rating":78},{"name":"Ali Daei","pos":["ST"],"rating":75}]},{"id":"real_madrid_00_04","club":"Real Madrid","era":"2000-04","rating":93,"players":[{"name":"Casillas","pos":["GK"],"rating":90},{"name":"C\u00e9sar S\u00e1nchez","pos":["GK"],"rating":79},{"name":"Roberto Carlos","pos":["LB"],"rating":90},{"name":"M\u00edchel Salgado","pos":["RB"],"rating":80},{"name":"Hierro","pos":["CB"],"rating":84},{"name":"Helguera","pos":["CB","CM"],"rating":80},{"name":"Zidane","pos":["CM"],"rating":96},{"name":"Mak\u00e9l\u00e9l\u00e9","pos":["CM"],"rating":88},{"name":"Figo","pos":["RW","RM"],"rating":91},{"name":"Ra\u00fal","pos":["ST","RW"],"rating":89},{"name":"Ronaldo","pos":["ST"],"rating":94},{"name":"Morientes","pos":["ST"],"rating":83},{"name":"Beckham","pos":["RM","CM"],"rating":86},{"name":"Owen","pos":["ST"],"rating":85},{"name":"Solari","pos":["LW","LM"],"rating":77},{"name":"Fl\u00e1vio Concei\u00e7\u00e3o","pos":["CM"],"rating":76},{"name":"Cambiasso","pos":["CM"],"rating":80},{"name":"Guti","pos":["CM","LM"],"rating":81}]},{"id":"barcelona_00_04","club":"Barcelona","era":"2000-04","rating":84,"players":[{"name":"V\u00edctor Vald\u00e9s","pos":["GK"],"rating":82},{"name":"Roberto Bonano","pos":["GK"],"rating":74},{"name":"Puyol","pos":["CB","RB"],"rating":87},{"name":"Frank de Boer","pos":["CB"],"rating":82},{"name":"Patrik Andersson","pos":["CB"],"rating":78},{"name":"Sergi","pos":["LB"],"rating":76},{"name":"Guardiola","pos":["CM"],"rating":80},{"name":"Cocu","pos":["CM"],"rating":80},{"name":"Xavi","pos":["CM"],"rating":86},{"name":"Rivaldo","pos":["LW","ST"],"rating":91},{"name":"Saviola","pos":["ST"],"rating":82},{"name":"Kluivert","pos":["ST"],"rating":84},{"name":"Overmars","pos":["LW","LM","RM","RW"],"rating":82},{"name":"Luis Enrique","pos":["CM","ST"],"rating":79},{"name":"Riquelme","pos":["CM","LM"],"rating":84},{"name":"Ronaldinho","pos":["LW","ST"],"rating":91},{"name":"Iniesta","pos":["CM","LM"],"rating":82},{"name":"Deco","pos":["CM"],"rating":85}]},{"id":"juventus_00_04","club":"Juventus","era":"2000-04","rating":87,"players":[{"name":"Buffon","pos":["GK"],"rating":92},{"name":"Chimenti","pos":["GK"],"rating":74},{"name":"Thuram","pos":["CB","RB"],"rating":87},{"name":"Ferrara","pos":["CB"],"rating":82},{"name":"Montero","pos":["CB"],"rating":82},{"name":"Zambrotta","pos":["RB","LB"],"rating":85},{"name":"Davids","pos":["CM"],"rating":85},{"name":"Nedv\u011bd","pos":["CM","LM"],"rating":90},{"name":"Conte","pos":["CM"],"rating":79},{"name":"Del Piero","pos":["ST","RW"],"rating":90},{"name":"Trezeguet","pos":["ST"],"rating":88},{"name":"Zalayeta","pos":["ST"],"rating":76},{"name":"Camoranesi","pos":["RM","CM","LW"],"rating":81},{"name":"Zidane","pos":["CM"],"rating":94},{"name":"Salas","pos":["ST"],"rating":79},{"name":"Birindelli","pos":["RB"],"rating":75},{"name":"Pessotto","pos":["LB","RB"],"rating":76},{"name":"Tudor","pos":["CB","CM"],"rating":78}]},{"id":"ac_milan_00_04","club":"AC Milan","era":"2000-04","rating":91,"players":[{"name":"Dida","pos":["GK"],"rating":85},{"name":"Sebastiano Rossi","pos":["GK"],"rating":79},{"name":"Maldini","pos":["LB","CB"],"rating":90},{"name":"Costacurta","pos":["CB"],"rating":82},{"name":"Nesta","pos":["CB"],"rating":91},{"name":"Cafu","pos":["RB"],"rating":88},{"name":"Pirlo","pos":["CM"],"rating":89},{"name":"Gattuso","pos":["CM"],"rating":83},{"name":"Seedorf","pos":["CM","RM","RW"],"rating":86},{"name":"Kak\u00e1","pos":["CM","ST"],"rating":88},{"name":"Shevchenko","pos":["ST"],"rating":91},{"name":"Inzaghi","pos":["ST"],"rating":85},{"name":"Rivaldo","pos":["LW","ST"],"rating":85},{"name":"Rui Costa","pos":["CM"],"rating":86},{"name":"Tomasson","pos":["ST"],"rating":79},{"name":"Ambrosini","pos":["CM"],"rating":79},{"name":"Stam","pos":["CB"],"rating":86},{"name":"Serginho","pos":["LB","LW","LM"],"rating":78}]},{"id":"inter_milan_00_04","club":"Inter Milan","era":"2000-04","rating":85,"players":[{"name":"Toldo","pos":["GK"],"rating":83},{"name":"Frey","pos":["GK"],"rating":77},{"name":"Zanetti","pos":["RB","CM","LB","LM"],"rating":87},{"name":"Cordoba","pos":["CB"],"rating":83},{"name":"Materazzi","pos":["CB"],"rating":81},{"name":"Cannavaro","pos":["CB"],"rating":87},{"name":"Emre","pos":["CM"],"rating":78},{"name":"Veron","pos":["CM"],"rating":84},{"name":"Cambiasso","pos":["CM"],"rating":84},{"name":"Ronaldo","pos":["ST"],"rating":90},{"name":"Vieri","pos":["ST"],"rating":88},{"name":"Recoba","pos":["LW","ST"],"rating":82},{"name":"Kallon","pos":["ST","LW"],"rating":74},{"name":"Crespo","pos":["ST"],"rating":85},{"name":"Di Biagio","pos":["CM"],"rating":78},{"name":"Farinos","pos":["CM"],"rating":74},{"name":"Almeyda","pos":["CM"],"rating":79},{"name":"Concei\u00e7\u00e3o","pos":["RM","RW"],"rating":78}]},{"id":"man_utd_00_04","club":"Man Utd","era":"2000-04","rating":86,"players":[{"name":"Fabien Barthez","pos":["GK"],"rating":84},{"name":"Roy Carroll","pos":["GK"],"rating":74},{"name":"Gary Neville","pos":["RB"],"rating":83},{"name":"Phil Neville","pos":["LB","RB"],"rating":77},{"name":"Jaap Stam","pos":["CB"],"rating":88},{"name":"Wes Brown","pos":["CB","RB"],"rating":78},{"name":"Roy Keane","pos":["CM"],"rating":89},{"name":"Paul Scholes","pos":["CM"],"rating":88},{"name":"Nicky Butt","pos":["CM"],"rating":78},{"name":"Ryan Giggs","pos":["LW","LM","RW"],"rating":87},{"name":"David Beckham","pos":["RM","CM"],"rating":86},{"name":"Ruud van Nistelrooy","pos":["ST"],"rating":91},{"name":"Andy Cole","pos":["ST"],"rating":81},{"name":"Ole Gunnar Solskj\u00e6r","pos":["ST"],"rating":81},{"name":"Diego Forl\u00e1n","pos":["ST"],"rating":78},{"name":"Ver\u00f3n","pos":["CM"],"rating":83},{"name":"Quinton Fortune","pos":["LB","LM"],"rating":74},{"name":"John O'Shea","pos":["CB","LB"],"rating":76}]},{"id":"liverpool_00_04","club":"Liverpool","era":"2000-04","rating":82,"players":[{"name":"Jerzy Dudek","pos":["GK"],"rating":81},{"name":"Chris Kirkland","pos":["GK"],"rating":76},{"name":"Jamie Carragher","pos":["CB","RB"],"rating":83},{"name":"Sami Hyypi\u00e4","pos":["CB"],"rating":84},{"name":"St\u00e9phane Henchoz","pos":["CB"],"rating":78},{"name":"John Arne Riise","pos":["LB","LM"],"rating":80},{"name":"Markus Babbel","pos":["RB"],"rating":79},{"name":"Didi Hamann","pos":["CM"],"rating":82},{"name":"Steven Gerrard","pos":["CM"],"rating":89},{"name":"Danny Murphy","pos":["CM","RM"],"rating":78},{"name":"Vladimir Smicer","pos":["RM","LM","LW"],"rating":77},{"name":"Michael Owen","pos":["ST"],"rating":87},{"name":"Emile Heskey","pos":["ST"],"rating":79},{"name":"Nicolas Anelka","pos":["ST"],"rating":82},{"name":"El-Hadji Diouf","pos":["RW","ST"],"rating":76},{"name":"Milan Baro\u0161","pos":["ST"],"rating":78},{"name":"Gary McAllister","pos":["CM"],"rating":78},{"name":"Abel Xavier","pos":["RB","CB"],"rating":74}]},{"id":"porto_00_04","club":"Porto","era":"2000-04","rating":84,"players":[{"name":"V\u00edtor Ba\u00eda","pos":["GK"],"rating":83},{"name":"Nuno","pos":["GK"],"rating":76},{"name":"Jorge Costa","pos":["CB"],"rating":81},{"name":"Ricardo Carvalho","pos":["CB"],"rating":86},{"name":"Nuno Valente","pos":["LB"],"rating":78},{"name":"Paulo Ferreira","pos":["RB"],"rating":79},{"name":"Costinha","pos":["CM"],"rating":78},{"name":"Deco","pos":["CM","LM"],"rating":87},{"name":"Maniche","pos":["CM"],"rating":82},{"name":"Dmitri Alenichev","pos":["CM","LM"],"rating":78},{"name":"Derlei","pos":["ST"],"rating":78},{"name":"Carlos Alberto","pos":["ST","RW"],"rating":77},{"name":"McCarthy","pos":["ST"],"rating":80},{"name":"Capucho","pos":["LW","LM"],"rating":78},{"name":"Quaresma","pos":["RW","RM"],"rating":80},{"name":"H\u00e9lder Postiga","pos":["ST"],"rating":75},{"name":"Edgar\u00e1s Jankauskas","pos":["ST"],"rating":75},{"name":"Pedro Emanuel","pos":["CM"],"rating":75}]},{"id":"arsenal_00_04","club":"Arsenal","era":"2000-04","rating":87,"players":[{"name":"David Seaman","pos":["GK"],"rating":84},{"name":"Stuart Taylor","pos":["GK"],"rating":72},{"name":"Tony Adams","pos":["CB"],"rating":82},{"name":"Sol Campbell","pos":["CB"],"rating":88},{"name":"Ashley Cole","pos":["LB"],"rating":87},{"name":"Lee Dixon","pos":["RB"],"rating":78},{"name":"Lauren","pos":["RB"],"rating":80},{"name":"Patrick Vieira","pos":["CM"],"rating":90},{"name":"Gilberto Silva","pos":["CM"],"rating":82},{"name":"Robert Pires","pos":["LW","LM"],"rating":87},{"name":"Freddie Ljungberg","pos":["CM","RM"],"rating":83},{"name":"Sylvain Wiltord","pos":["LW","ST"],"rating":81},{"name":"Thierry Henry","pos":["ST","LW"],"rating":93},{"name":"Dennis Bergkamp","pos":["ST","RW"],"rating":88},{"name":"Kanu","pos":["ST"],"rating":79},{"name":"Jos\u00e9 Antonio Reyes","pos":["LW","RW"],"rating":80},{"name":"Martin Keown","pos":["CB"],"rating":78},{"name":"Edu","pos":["CM"],"rating":78}]},{"id":"chelsea_00_04","club":"Chelsea","era":"2000-04","rating":83,"players":[{"name":"Carlo Cudicini","pos":["GK"],"rating":81},{"name":"Mark Bosnich","pos":["GK"],"rating":77},{"name":"Marcel Desailly","pos":["CB"],"rating":84},{"name":"John Terry","pos":["CB"],"rating":86},{"name":"William Gallas","pos":["CB","LB"],"rating":83},{"name":"Celestine Babayaro","pos":["LB"],"rating":76},{"name":"Graeme Le Saux","pos":["LB"],"rating":78},{"name":"Frank Lampard","pos":["CM"],"rating":87},{"name":"Claude Mak\u00e9l\u00e9l\u00e9","pos":["CM"],"rating":87},{"name":"Joe Cole","pos":["CM","LM"],"rating":80},{"name":"Damien Duff","pos":["LW","LM"],"rating":83},{"name":"Jesper Gronkjaer","pos":["RW","RM"],"rating":77},{"name":"Jimmy Floyd Hasselbaink","pos":["ST"],"rating":85},{"name":"Eidur Gudjohnsen","pos":["ST"],"rating":82},{"name":"Gianfranco Zola","pos":["ST","RW"],"rating":85},{"name":"Juan Sebasti\u00e1n Ver\u00f3n","pos":["CM"],"rating":82},{"name":"Mario Stanic","pos":["CM","RM","RB"],"rating":74},{"name":"Hernan Crespo","pos":["ST"],"rating":84}]},{"id":"chelsea_05_09","club":"Chelsea","era":"2005-09","rating":89,"players":[{"name":"Petr \u010cech","pos":["GK"],"rating":91},{"name":"Carlo Cudicini","pos":["GK"],"rating":79},{"name":"John Terry","pos":["CB"],"rating":91},{"name":"Ricardo Carvalho","pos":["CB"],"rating":87},{"name":"Ashley Cole","pos":["LB"],"rating":88},{"name":"Paulo Ferreira","pos":["RB"],"rating":78},{"name":"Frank Lampard","pos":["CM"],"rating":90},{"name":"Claude Mak\u00e9l\u00e9l\u00e9","pos":["CM"],"rating":87},{"name":"Michael Ballack","pos":["CM"],"rating":87},{"name":"Joe Cole","pos":["LM","CM"],"rating":81},{"name":"Arjen Robben","pos":["RW","LW"],"rating":87},{"name":"Damien Duff","pos":["LW","LM","RM"],"rating":82},{"name":"Didier Drogba","pos":["ST"],"rating":91},{"name":"Hernan Crespo","pos":["ST"],"rating":83},{"name":"Salomon Kalou","pos":["ST","LW"],"rating":76},{"name":"Nicolas Anelka","pos":["ST"],"rating":83},{"name":"Florent Malouda","pos":["LW","LM"],"rating":81},{"name":"Alex","pos":["CB"],"rating":80}]},{"id":"real_madrid_05_09","club":"Real Madrid","era":"2005-09","rating":88,"players":[{"name":"Casillas","pos":["GK"],"rating":92},{"name":"Jerzy Dudek","pos":["GK"],"rating":78},{"name":"Sergio Ramos","pos":["CB","RB"],"rating":88},{"name":"Pepe","pos":["CB"],"rating":85},{"name":"Cannavaro","pos":["CB"],"rating":87},{"name":"Roberto Carlos","pos":["LB"],"rating":86},{"name":"Marcelo","pos":["LB"],"rating":84},{"name":"Guti","pos":["CM","LM"],"rating":81},{"name":"Mahamadou Diarra","pos":["CM"],"rating":80},{"name":"Emerson","pos":["CM"],"rating":80},{"name":"Robinho","pos":["LW","ST"],"rating":83},{"name":"Ra\u00fal","pos":["ST","RW"],"rating":85},{"name":"Ronaldo","pos":["ST"],"rating":87},{"name":"Van Nistelrooy","pos":["ST"],"rating":87},{"name":"Sneijder","pos":["CM","RM"],"rating":86},{"name":"Baptista","pos":["ST","CM"],"rating":79},{"name":"Sergio Ramos","pos":["RB","CB"],"rating":88},{"name":"Heinze","pos":["LB","CB"],"rating":80}]},{"id":"barcelona_05_09","club":"Barcelona","era":"2005-09","rating":92,"players":[{"name":"V\u00edctor Vald\u00e9s","pos":["GK"],"rating":84},{"name":"Albert Jorquera","pos":["GK"],"rating":71},{"name":"Puyol","pos":["CB"],"rating":87},{"name":"M\u00e1rquez","pos":["CB","CM"],"rating":82},{"name":"Milito","pos":["CB"],"rating":79},{"name":"Sylvinho","pos":["LB"],"rating":77},{"name":"Abidal","pos":["LB","CB"],"rating":83},{"name":"Zambrotta","pos":["RB"],"rating":83},{"name":"Deco","pos":["CM","RM"],"rating":84},{"name":"Xavi","pos":["CM"],"rating":91},{"name":"Iniesta","pos":["CM","LM"],"rating":90},{"name":"Ronaldinho","pos":["LW","ST"],"rating":93},{"name":"Messi","pos":["RW","ST"],"rating":91},{"name":"Eto'o","pos":["ST"],"rating":90},{"name":"Henry","pos":["LW","ST"],"rating":87},{"name":"Keita","pos":["CM"],"rating":78},{"name":"Gudjohnsen","pos":["ST"],"rating":78},{"name":"Toure Yaya","pos":["CM","CB"],"rating":85}]},{"id":"juventus_05_09","club":"Juventus","era":"2005-09","rating":81,"players":[{"name":"Buffon","pos":["GK"],"rating":91},{"name":"Manninger","pos":["GK"],"rating":73},{"name":"Giorgio Chiellini","pos":["CB","LB"],"rating":84},{"name":"Luca Toni","pos":["ST"],"rating":84},{"name":"Zambrotta","pos":["RB","LB"],"rating":83},{"name":"Cannavaro","pos":["CB"],"rating":86},{"name":"Emerson","pos":["CM"],"rating":81},{"name":"Camoranesi","pos":["RM","CM"],"rating":80},{"name":"Trezeguet","pos":["ST"],"rating":84},{"name":"Del Piero","pos":["ST","RW"],"rating":85},{"name":"Pavel Nedv\u011bd","pos":["CM","LM"],"rating":86},{"name":"Ibrahimovic","pos":["ST"],"rating":87},{"name":"Diego","pos":["CM","LM","LW"],"rating":82},{"name":"Marchisio","pos":["CM"],"rating":80},{"name":"De Ceglie","pos":["LB"],"rating":73},{"name":"Grygera","pos":["RB"],"rating":74},{"name":"Legrottaglie","pos":["CB"],"rating":79},{"name":"Poulsen","pos":["CM"],"rating":75}]},{"id":"ac_milan_05_09","club":"AC Milan","era":"2005-09","rating":88,"players":[{"name":"Dida","pos":["GK"],"rating":84},{"name":"Abbiati","pos":["GK"],"rating":79},{"name":"Maldini","pos":["LB","CB"],"rating":87},{"name":"Nesta","pos":["CB"],"rating":89},{"name":"Stam","pos":["CB"],"rating":83},{"name":"Cafu","pos":["RB"],"rating":84},{"name":"Oddo","pos":["RB"],"rating":77},{"name":"Pirlo","pos":["CM"],"rating":90},{"name":"Gattuso","pos":["CM"],"rating":84},{"name":"Seedorf","pos":["CM","RM","RW"],"rating":85},{"name":"Kak\u00e1","pos":["CM","ST"],"rating":93},{"name":"Shevchenko","pos":["ST"],"rating":89},{"name":"Inzaghi","pos":["ST"],"rating":84},{"name":"Ambrosini","pos":["CM"],"rating":79},{"name":"Gilardino","pos":["ST"],"rating":80},{"name":"Jankulovski","pos":["LB"],"rating":77},{"name":"Serginho","pos":["LB","LW","LM"],"rating":76},{"name":"Borriello","pos":["ST"],"rating":75}]},{"id":"inter_milan_05_09","club":"Inter Milan","era":"2005-09","rating":86,"players":[{"name":"J\u00falio C\u00e9sar","pos":["GK"],"rating":86},{"name":"Francesco Toldo","pos":["GK"],"rating":79},{"name":"Zanetti","pos":["RB","CM"],"rating":85},{"name":"Cordoba","pos":["CB"],"rating":83},{"name":"Materazzi","pos":["CB"],"rating":81},{"name":"Burdisso","pos":["CB","LB"],"rating":78},{"name":"Maicon","pos":["RB"],"rating":88},{"name":"Maxwell","pos":["LB","LM"],"rating":80},{"name":"Stankovic","pos":["CM","LM"],"rating":82},{"name":"Cambiasso","pos":["CM"],"rating":86},{"name":"Veron","pos":["CM"],"rating":80},{"name":"Adriano","pos":["ST"],"rating":86},{"name":"Ibrahimovic","pos":["ST"],"rating":88},{"name":"Cruz","pos":["ST"],"rating":79},{"name":"Figo","pos":["RM","RW"],"rating":84},{"name":"Recoba","pos":["LW","ST"],"rating":78},{"name":"Vieira","pos":["CM"],"rating":84},{"name":"Suazo","pos":["ST"],"rating":76}]},{"id":"man_utd_05_09","club":"Man Utd","era":"2005-09","rating":90,"players":[{"name":"Edwin van der Sar","pos":["GK"],"rating":88},{"name":"Ben Foster","pos":["GK"],"rating":76},{"name":"Gary Neville","pos":["RB"],"rating":81},{"name":"Patrice Evra","pos":["LB"],"rating":85},{"name":"Rio Ferdinand","pos":["CB"],"rating":89},{"name":"Nemanja Vidi\u0107","pos":["CB"],"rating":89},{"name":"Wes Brown","pos":["RB","CB"],"rating":78},{"name":"Roy Keane","pos":["CM"],"rating":86},{"name":"Paul Scholes","pos":["CM"],"rating":87},{"name":"Michael Carrick","pos":["CM"],"rating":83},{"name":"Ryan Giggs","pos":["LW","LM"],"rating":85},{"name":"Cristiano Ronaldo","pos":["RW","LW"],"rating":94},{"name":"Wayne Rooney","pos":["ST","LW"],"rating":90},{"name":"Carlos Tevez","pos":["ST","LW"],"rating":86},{"name":"Ruud van Nistelrooy","pos":["ST"],"rating":88},{"name":"Louis Saha","pos":["ST"],"rating":79},{"name":"Anderson","pos":["CM"],"rating":78},{"name":"Nani","pos":["RW","LW","RM"],"rating":81}]},{"id":"liverpool_05_09","club":"Liverpool","era":"2005-09","rating":86,"players":[{"name":"Jerzy Dudek","pos":["GK"],"rating":81},{"name":"Pepe Reina","pos":["GK"],"rating":87},{"name":"Jamie Carragher","pos":["CB"],"rating":85},{"name":"Sami Hyypi\u00e4","pos":["CB"],"rating":82},{"name":"Daniel Agger","pos":["CB","LB"],"rating":80},{"name":"John Arne Riise","pos":["LB"],"rating":80},{"name":"\u00c1lvaro Arbeloa","pos":["RB","LB"],"rating":78},{"name":"Didi Hamann","pos":["CM"],"rating":82},{"name":"Steven Gerrard","pos":["CM"],"rating":91},{"name":"Xabi Alonso","pos":["CM"],"rating":88},{"name":"Jermaine Pennant","pos":["RM","RW","LM"],"rating":76},{"name":"Luis Garc\u00eda","pos":["CM","RM"],"rating":79},{"name":"Robbie Fowler","pos":["ST"],"rating":81},{"name":"Peter Crouch","pos":["ST"],"rating":77},{"name":"Fernando Torres","pos":["ST"],"rating":90},{"name":"Dirk Kuyt","pos":["ST","RM"],"rating":80},{"name":"Ryan Babel","pos":["LW","ST"],"rating":77},{"name":"Robbie Keane","pos":["ST"],"rating":78}]},{"id":"arsenal_05_09","club":"Arsenal","era":"2005-09","rating":84,"players":[{"name":"Jens Lehmann","pos":["GK"],"rating":83},{"name":"Manuel Almunia","pos":["GK"],"rating":77},{"name":"Sol Campbell","pos":["CB"],"rating":84},{"name":"William Gallas","pos":["CB"],"rating":83},{"name":"Kolo Tour\u00e9","pos":["CB","RB"],"rating":82},{"name":"Ashley Cole","pos":["LB"],"rating":86},{"name":"Lauren","pos":["RB"],"rating":78},{"name":"Patrick Vieira","pos":["CM"],"rating":88},{"name":"Gilberto Silva","pos":["CM"],"rating":81},{"name":"Cesc F\u00e0bregas","pos":["CM"],"rating":87},{"name":"Freddie Ljungberg","pos":["CM","RM"],"rating":81},{"name":"Robert Pires","pos":["LW","LM"],"rating":85},{"name":"Thierry Henry","pos":["ST","LW"],"rating":92},{"name":"Robin van Persie","pos":["ST","LW"],"rating":85},{"name":"Emmanuel Adebayor","pos":["ST"],"rating":83},{"name":"Jos\u00e9 Antonio Reyes","pos":["LW","RW"],"rating":79},{"name":"Samir Nasri","pos":["CM","LM"],"rating":82},{"name":"Tomas Rosicky","pos":["CM","RM"],"rating":80}]},{"id":"dortmund_05_09","club":"Borussia Dortmund","era":"2005-09","rating":78,"players":[{"name":"Roman Weidenfeller","pos":["GK"],"rating":80},{"name":"Marc Ziegler","pos":["GK"],"rating":72},{"name":"Christoph Metzelder","pos":["CB"],"rating":79},{"name":"Robert Kova\u010d","pos":["CB","CM"],"rating":77},{"name":"Christian W\u00f6rns","pos":["CB"],"rating":76},{"name":"Dede","pos":["LB","CB"],"rating":78},{"name":"Marcio Amoroso","pos":["ST","RW"],"rating":80},{"name":"Jan Koller","pos":["ST"],"rating":79},{"name":"Lars Ricken","pos":["CM","RM"],"rating":75},{"name":"Tinga","pos":["CM"],"rating":76},{"name":"Sebastian Kehl","pos":["CM"],"rating":78},{"name":"Nuri \u015eahin","pos":["CM"],"rating":78},{"name":"Alexander Frei","pos":["ST"],"rating":78},{"name":"Mladen Petri\u0107","pos":["ST","LW"],"rating":76},{"name":"Marc-Andr\u00e9 Kruska","pos":["CM","LM"],"rating":73},{"name":"Patrick Owomoyela","pos":["RB","RM"],"rating":74},{"name":"Jakub B\u0142aszczykowski","pos":["RM","RW"],"rating":79},{"name":"Tamas Hajnal","pos":["CM"],"rating":72}]},{"id":"atletico_madrid_05_09","club":"Atletico Madrid","era":"2005-09","rating":79,"players":[{"name":"Leo Franco","pos":["GK"],"rating":79},{"name":"Sergio Asenjo","pos":["GK"],"rating":76},{"name":"Perea","pos":["CB"],"rating":77},{"name":"Ujfalusi","pos":["CB"],"rating":78},{"name":"Antonio L\u00f3pez","pos":["RB","CB"],"rating":76},{"name":"Filipe Lu\u00eds","pos":["LB"],"rating":82},{"name":"Maxi Rodr\u00edguez","pos":["LM","CM"],"rating":82},{"name":"Maniche","pos":["CM"],"rating":79},{"name":"Pablo Ib\u00e1\u00f1ez","pos":["CB"],"rating":78},{"name":"Sim\u00e3o Sabrosa","pos":["RW","RM"],"rating":81},{"name":"Diego Forl\u00e1n","pos":["ST"],"rating":84},{"name":"Fernando Torres","pos":["ST"],"rating":88},{"name":"Ag\u00fcero","pos":["ST","LW"],"rating":84},{"name":"Reyes","pos":["LW","RW"],"rating":79},{"name":"De la Pe\u00f1a","pos":["CM"],"rating":74},{"name":"Valera","pos":["LB","LM"],"rating":73},{"name":"Ze Garcia","pos":["CB","LB"],"rating":75},{"name":"Luis Garcia","pos":["CM","RM"],"rating":77}]},{"id":"real_madrid_10_14","club":"Real Madrid","era":"2010-14","rating":93,"players":[{"name":"Casillas","pos":["GK"],"rating":91},{"name":"Diego L\u00f3pez","pos":["GK"],"rating":82},{"name":"Sergio Ramos","pos":["CB","RB"],"rating":90},{"name":"Pepe","pos":["CB"],"rating":87},{"name":"Varane","pos":["CB"],"rating":86},{"name":"Marcelo","pos":["LB"],"rating":88},{"name":"Arbeloa","pos":["RB"],"rating":79},{"name":"Xabi Alonso","pos":["CM"],"rating":89},{"name":"Sami Khedira","pos":["CM"],"rating":85},{"name":"Luka Modri\u0107","pos":["CM"],"rating":90},{"name":"\u00c1ngel Di Mar\u00eda","pos":["LW","RM","LM"],"rating":87},{"name":"Cristiano Ronaldo","pos":["LW","ST"],"rating":96},{"name":"Karim Benzema","pos":["ST"],"rating":88},{"name":"Gonzalo Higua\u00edn","pos":["ST"],"rating":86},{"name":"Ozil","pos":["CM","RW"],"rating":88},{"name":"Fabio Coentrao","pos":["LB"],"rating":80},{"name":"Granero","pos":["CM"],"rating":76},{"name":"Callej\u00f3n","pos":["RW","ST"],"rating":78}]},{"id":"barcelona_10_14","club":"Barcelona","era":"2010-14","rating":95,"players":[{"name":"V\u00edctor Vald\u00e9s","pos":["GK"],"rating":85},{"name":"Jos\u00e9 Pinto","pos":["GK"],"rating":73},{"name":"Puyol","pos":["CB"],"rating":85},{"name":"Piqu\u00e9","pos":["CB"],"rating":88},{"name":"Abidal","pos":["LB","CB"],"rating":84},{"name":"Dani Alves","pos":["RB","RM"],"rating":90},{"name":"Adriano","pos":["LB","CB"],"rating":80},{"name":"Xavi","pos":["CM"],"rating":93},{"name":"Iniesta","pos":["CM","LM"],"rating":93},{"name":"Sergio Busquets","pos":["CM"],"rating":90},{"name":"Alexis S\u00e1nchez","pos":["LW","RW"],"rating":86},{"name":"David Villa","pos":["ST","LW"],"rating":88},{"name":"Pedro","pos":["RW","ST"],"rating":83},{"name":"Messi","pos":["RW","ST"],"rating":98},{"name":"Fabregas","pos":["CM"],"rating":88},{"name":"Thiago","pos":["CM"],"rating":83},{"name":"Milito","pos":["CB"],"rating":77},{"name":"Cuenca","pos":["LW"],"rating":73}]},{"id":"bayern_munich_10_14","club":"Bayern Munich","era":"2010-14","rating":92,"players":[{"name":"Manuel Neuer","pos":["GK"],"rating":94},{"name":"Sven Ulreich","pos":["GK"],"rating":77},{"name":"Philipp Lahm","pos":["RB","LB"],"rating":91},{"name":"David Alaba","pos":["LB","CB"],"rating":87},{"name":"Jerome Boateng","pos":["CB"],"rating":88},{"name":"Dante","pos":["CB"],"rating":83},{"name":"Rafinha","pos":["RB"],"rating":78},{"name":"Bastian Schweinsteiger","pos":["CM"],"rating":89},{"name":"Toni Kroos","pos":["CM"],"rating":90},{"name":"Javi Mart\u00ednez","pos":["CM","CB"],"rating":84},{"name":"Robben","pos":["RW","LW"],"rating":90},{"name":"Franck Rib\u00e9ry","pos":["LW","RM","LM"],"rating":91},{"name":"Thomas M\u00fcller","pos":["RW","ST"],"rating":88},{"name":"Mario Mand\u017euki\u0107","pos":["ST"],"rating":84},{"name":"Mario G\u00f3mez","pos":["ST"],"rating":84},{"name":"Luiz Gustavo","pos":["CM"],"rating":80},{"name":"Contento","pos":["LB"],"rating":73},{"name":"Van Buyten","pos":["CB"],"rating":79}]},{"id":"chelsea_10_14","club":"Chelsea","era":"2010-14","rating":87,"players":[{"name":"Petr \u010cech","pos":["GK"],"rating":89},{"name":"Hilario","pos":["GK"],"rating":73},{"name":"John Terry","pos":["CB"],"rating":88},{"name":"David Luiz","pos":["CB","CM"],"rating":85},{"name":"Gary Cahill","pos":["CB"],"rating":83},{"name":"Ashley Cole","pos":["LB"],"rating":86},{"name":"Branislav Ivanovi\u0107","pos":["RB","CB"],"rating":83},{"name":"Frank Lampard","pos":["CM"],"rating":87},{"name":"John Obi Mikel","pos":["CM"],"rating":78},{"name":"Ramires","pos":["CM","RM","LM"],"rating":80},{"name":"Juan Mata","pos":["CM","RW"],"rating":86},{"name":"Eden Hazard","pos":["LW","CM"],"rating":89},{"name":"Oscar","pos":["CM","LW"],"rating":82},{"name":"Didier Drogba","pos":["ST"],"rating":89},{"name":"Fernando Torres","pos":["ST"],"rating":82},{"name":"Daniel Sturridge","pos":["ST","LW"],"rating":82},{"name":"Victor Moses","pos":["RW","LW"],"rating":77},{"name":"Salah","pos":["RW","LW"],"rating":78}]},{"id":"man_utd_10_14","club":"Man Utd","era":"2010-14","rating":86,"players":[{"name":"David De Gea","pos":["GK"],"rating":87},{"name":"Anders Lindegaard","pos":["GK"],"rating":75},{"name":"Rio Ferdinand","pos":["CB"],"rating":85},{"name":"Nemanja Vidi\u0107","pos":["CB"],"rating":87},{"name":"Jonny Evans","pos":["CB"],"rating":79},{"name":"Rafael","pos":["RB"],"rating":80},{"name":"Patrice Evra","pos":["LB"],"rating":83},{"name":"Michael Carrick","pos":["CM"],"rating":85},{"name":"Paul Scholes","pos":["CM"],"rating":85},{"name":"Tom Cleverley","pos":["CM"],"rating":74},{"name":"Nani","pos":["RW","LW"],"rating":82},{"name":"Wayne Rooney","pos":["ST","LW"],"rating":89},{"name":"Robin van Persie","pos":["ST"],"rating":90},{"name":"Javier Hern\u00e1ndez","pos":["ST"],"rating":82},{"name":"Antonio Valencia","pos":["RM","RB"],"rating":82},{"name":"Shinji Kagawa","pos":["CM","LW"],"rating":81},{"name":"Ashley Young","pos":["LW","RM","LM"],"rating":79},{"name":"Danny Welbeck","pos":["ST","LW"],"rating":78}]},{"id":"man_city_10_14","club":"Man City","era":"2010-14","rating":87,"players":[{"name":"Joe Hart","pos":["GK"],"rating":85},{"name":"Costel Pantilimon","pos":["GK"],"rating":75},{"name":"Vincent Kompany","pos":["CB"],"rating":89},{"name":"Joleon Lescott","pos":["CB"],"rating":80},{"name":"Pablo Zabaleta","pos":["RB"],"rating":82},{"name":"Gael Clichy","pos":["LB"],"rating":80},{"name":"Aleksandar Kolarov","pos":["LB"],"rating":79},{"name":"Yaya Tour\u00e9","pos":["CM"],"rating":90},{"name":"Gareth Barry","pos":["CM"],"rating":79},{"name":"James Milner","pos":["CM","RM"],"rating":80},{"name":"David Silva","pos":["CM","LM"],"rating":90},{"name":"Samir Nasri","pos":["CM","LM"],"rating":83},{"name":"Edin D\u017eeko","pos":["ST"],"rating":82},{"name":"Sergio Ag\u00fcero","pos":["ST"],"rating":91},{"name":"Carlos Tevez","pos":["ST","LW"],"rating":86},{"name":"Mario Balotelli","pos":["ST"],"rating":82},{"name":"Adam Johnson","pos":["LW","RM","RW"],"rating":78},{"name":"Micah Richards","pos":["RB","CB"],"rating":78}]},{"id":"juventus_10_14","club":"Juventus","era":"2010-14","rating":87,"players":[{"name":"Buffon","pos":["GK"],"rating":91},{"name":"Storari","pos":["GK"],"rating":76},{"name":"Giorgio Chiellini","pos":["CB","LB"],"rating":88},{"name":"Leonardo Bonucci","pos":["CB"],"rating":88},{"name":"Andrea Barzagli","pos":["CB","RB"],"rating":86},{"name":"Stephan Lichtsteiner","pos":["RB"],"rating":82},{"name":"Patrice Evra","pos":["LB"],"rating":81},{"name":"Andrea Pirlo","pos":["CM"],"rating":90},{"name":"Arturo Vidal","pos":["CM"],"rating":88},{"name":"Claudio Marchisio","pos":["CM"],"rating":84},{"name":"Paul Pogba","pos":["CM"],"rating":86},{"name":"Alessandro Matri","pos":["ST"],"rating":78},{"name":"Carlos Tevez","pos":["ST","LW"],"rating":86},{"name":"Fernando Llorente","pos":["ST"],"rating":81},{"name":"Mirko Vu\u010dini\u0107","pos":["ST","LW"],"rating":80},{"name":"Kwadwo Asamoah","pos":["LM","LB","RW"],"rating":80},{"name":"Simone Padoin","pos":["CM","RM"],"rating":73},{"name":"Sebastian Giovinco","pos":["ST","LW"],"rating":80}]},{"id":"dortmund_10_14","club":"Borussia Dortmund","era":"2010-14","rating":88,"players":[{"name":"Roman Weidenfeller","pos":["GK"],"rating":83},{"name":"Mitchell Langerak","pos":["GK"],"rating":75},{"name":"Mats Hummels","pos":["CB"],"rating":89},{"name":"Neven Suboti\u0107","pos":["CB"],"rating":82},{"name":"Marcel Schmelzer","pos":["LB"],"rating":80},{"name":"\u0141ukasz Piszczek","pos":["RB"],"rating":83},{"name":"Nuri \u015eahin","pos":["CM"],"rating":82},{"name":"Sven Bender","pos":["CM"],"rating":79},{"name":"Mario G\u00f6tze","pos":["CM","LW"],"rating":88},{"name":"Ilkay G\u00fcndogan","pos":["CM"],"rating":85},{"name":"Kevin Gro\u00dfkreutz","pos":["RM","RB"],"rating":77},{"name":"Jakub B\u0142aszczykowski","pos":["RM","RW"],"rating":81},{"name":"Robert Lewandowski","pos":["ST"],"rating":89},{"name":"Pierre-Emerick Aubameyang","pos":["ST","LW"],"rating":87},{"name":"Marco Reus","pos":["LW","CM"],"rating":89},{"name":"Henrikh Mkhitaryan","pos":["CM","RW"],"rating":84},{"name":"Ivan Peri\u0161i\u0107","pos":["LW","LM"],"rating":81},{"name":"Schmelle","pos":["LB"],"rating":78}]},{"id":"atletico_madrid_10_14","club":"Atletico Madrid","era":"2010-14","rating":87,"players":[{"name":"Thibaut Courtois","pos":["GK"],"rating":88},{"name":"Miguel \u00c1ngel Moy\u00e1","pos":["GK"],"rating":78},{"name":"Diego God\u00edn","pos":["CB"],"rating":90},{"name":"Miranda","pos":["CB"],"rating":84},{"name":"Filipe Lu\u00eds","pos":["LB"],"rating":85},{"name":"Juanfran","pos":["RB"],"rating":82},{"name":"Mario Su\u00e1rez","pos":["CM"],"rating":78},{"name":"Gabi","pos":["CM"],"rating":81},{"name":"Arda Turan","pos":["CM","LM"],"rating":85},{"name":"Koke","pos":["CM","RM","RW"],"rating":84},{"name":"Diego Forl\u00e1n","pos":["ST"],"rating":83},{"name":"Sergio Ag\u00fcero","pos":["ST","LW"],"rating":88},{"name":"Radamel Falcao","pos":["ST"],"rating":91},{"name":"Diego Costa","pos":["ST"],"rating":87},{"name":"David Villa","pos":["ST","LW"],"rating":85},{"name":"Adri\u00e1n","pos":["ST","LW"],"rating":76},{"name":"Tiago","pos":["CM"],"rating":80},{"name":"Cristian Ansaldi","pos":["LB","LM"],"rating":75}]},{"id":"liverpool_10_14","club":"Liverpool","era":"2010-14","rating":83,"players":[{"name":"Pepe Reina","pos":["GK"],"rating":85},{"name":"Brad Jones","pos":["GK"],"rating":73},{"name":"Jamie Carragher","pos":["CB"],"rating":82},{"name":"Daniel Agger","pos":["CB","LB"],"rating":81},{"name":"Martin \u0160krtel","pos":["CB"],"rating":82},{"name":"Glen Johnson","pos":["RB"],"rating":80},{"name":"Jos\u00e9 Enrique","pos":["LB"],"rating":78},{"name":"Steven Gerrard","pos":["CM"],"rating":88},{"name":"Jordan Henderson","pos":["CM"],"rating":80},{"name":"Lucas Leiva","pos":["CM"],"rating":78},{"name":"Philippe Coutinho","pos":["CM","LM"],"rating":85},{"name":"Luis Su\u00e1rez","pos":["ST","LW"],"rating":93},{"name":"Daniel Sturridge","pos":["ST","LW"],"rating":84},{"name":"Raheem Sterling","pos":["LW","RW"],"rating":82},{"name":"Stewart Downing","pos":["LM","LW","RM"],"rating":76},{"name":"Maxi Rodriguez","pos":["LM","CM"],"rating":77},{"name":"Andy Carroll","pos":["ST"],"rating":77},{"name":"Victor Moses","pos":["RW","LW"],"rating":76}]},{"id":"arsenal_10_14","club":"Arsenal","era":"2010-14","rating":82,"players":[{"name":"Wojciech Szcz\u0119sny","pos":["GK"],"rating":82},{"name":"Lukasz Fabianski","pos":["GK"],"rating":75},{"name":"Laurent Koscielny","pos":["CB"],"rating":85},{"name":"Per Mertesacker","pos":["CB"],"rating":83},{"name":"Thomas Vermaelen","pos":["CB","LB"],"rating":80},{"name":"Bacary Sagna","pos":["RB"],"rating":82},{"name":"Nacho Monreal","pos":["LB"],"rating":79},{"name":"Cesc F\u00e0bregas","pos":["CM"],"rating":87},{"name":"Jack Wilshere","pos":["CM"],"rating":81},{"name":"Aaron Ramsey","pos":["CM"],"rating":83},{"name":"Mikel Arteta","pos":["CM"],"rating":80},{"name":"Samir Nasri","pos":["CM","LM"],"rating":83},{"name":"Theo Walcott","pos":["RW","ST"],"rating":81},{"name":"Robin van Persie","pos":["ST"],"rating":91},{"name":"Lukas Podolski","pos":["LW","ST"],"rating":81},{"name":"Olivier Giroud","pos":["ST"],"rating":82},{"name":"Alex Oxlade-Chamberlain","pos":["CM","RW","RM"],"rating":79},{"name":"Santi Cazorla","pos":["CM","LM"],"rating":85}]},{"id":"ac_milan_10_14","club":"AC Milan","era":"2010-14","rating":84,"players":[{"name":"Abbiati","pos":["GK"],"rating":81},{"name":"Marco Amelia","pos":["GK"],"rating":74},{"name":"Thiago Silva","pos":["CB"],"rating":91},{"name":"Alessandro Nesta","pos":["CB"],"rating":85},{"name":"Maldini","pos":["LB","CB"],"rating":82},{"name":"Ignazio Abate","pos":["RB"],"rating":79},{"name":"Emanuelson","pos":["LB","LM"],"rating":76},{"name":"Pirlo","pos":["CM"],"rating":89},{"name":"Gattuso","pos":["CM"],"rating":80},{"name":"Seedorf","pos":["CM","RM"],"rating":82},{"name":"Kak\u00e1","pos":["CM","ST"],"rating":87},{"name":"Zlatan Ibrahimovic","pos":["ST"],"rating":92},{"name":"Alexandre Pato","pos":["ST","LW"],"rating":83},{"name":"Robinho","pos":["LW","ST"],"rating":81},{"name":"Antonio Nocerino","pos":["CM"],"rating":78},{"name":"Massimo Ambrosini","pos":["CM"],"rating":77},{"name":"Kevin-Prince Boateng","pos":["CM","LM"],"rating":80},{"name":"El Shaarawy","pos":["LW","ST","RW"],"rating":81}]},{"id":"inter_milan_10_14","club":"Inter Milan","era":"2010-14","rating":85,"players":[{"name":"J\u00falio C\u00e9sar","pos":["GK"],"rating":85},{"name":"Castellazzi","pos":["GK"],"rating":74},{"name":"Zanetti","pos":["RB","CM"],"rating":84},{"name":"Cordoba","pos":["CB"],"rating":80},{"name":"Lucio","pos":["CB"],"rating":84},{"name":"Maicon","pos":["RB","LB"],"rating":87},{"name":"Samuel","pos":["CB","LB"],"rating":83},{"name":"Cambiasso","pos":["CM"],"rating":85},{"name":"Stankovic","pos":["CM"],"rating":81},{"name":"Sneijder","pos":["CM","RM"],"rating":89},{"name":"Samuel Eto'o","pos":["ST"],"rating":88},{"name":"Diego Milito","pos":["ST"],"rating":86},{"name":"Pandev","pos":["LW","ST"],"rating":78},{"name":"Muntari","pos":["CM","LM"],"rating":79},{"name":"Biabiany","pos":["LW","RW"],"rating":74},{"name":"Palacio","pos":["ST","LW"],"rating":81},{"name":"Guarin","pos":["CM"],"rating":79},{"name":"Coutinho","pos":["CM","LM"],"rating":78}]},{"id":"real_madrid_15_19","club":"Real Madrid","era":"2015-19","rating":93,"players":[{"name":"Keylor Navas","pos":["GK"],"rating":87},{"name":"Kiko Casilla","pos":["GK"],"rating":75},{"name":"Sergio Ramos","pos":["CB"],"rating":91},{"name":"Varane","pos":["CB"],"rating":89},{"name":"Marcelo","pos":["LB"],"rating":88},{"name":"Carvajal","pos":["RB"],"rating":85},{"name":"Nacho","pos":["CB","LB"],"rating":79},{"name":"Luka Modri\u0107","pos":["CM"],"rating":93},{"name":"Toni Kroos","pos":["CM"],"rating":92},{"name":"Casemiro","pos":["CM"],"rating":88},{"name":"Isco","pos":["CM","LW","LM"],"rating":85},{"name":"Gareth Bale","pos":["RW","LW"],"rating":89},{"name":"Cristiano Ronaldo","pos":["LW","ST"],"rating":97},{"name":"Karim Benzema","pos":["ST"],"rating":89},{"name":"James Rodr\u00edguez","pos":["CM","RW"],"rating":86},{"name":"Asensio","pos":["LW","RW"],"rating":82},{"name":"Kova\u010di\u0107","pos":["CM"],"rating":82},{"name":"Lucas V\u00e1zquez","pos":["RM","RW"],"rating":78}]},{"id":"barcelona_15_19","club":"Barcelona","era":"2015-19","rating":93,"players":[{"name":"Marc-Andr\u00e9 ter Stegen","pos":["GK"],"rating":91},{"name":"Jasper Cillessen","pos":["GK"],"rating":78},{"name":"Piqu\u00e9","pos":["CB"],"rating":87},{"name":"Mascherano","pos":["CB","CM"],"rating":85},{"name":"Jeremy Mathieu","pos":["CB","LB"],"rating":79},{"name":"Jordi Alba","pos":["LB"],"rating":87},{"name":"Dani Alves","pos":["RB","RM"],"rating":89},{"name":"Sergi Roberto","pos":["RB","CM"],"rating":80},{"name":"Xavi","pos":["CM"],"rating":89},{"name":"Iniesta","pos":["CM","LM"],"rating":91},{"name":"Sergio Busquets","pos":["CM"],"rating":88},{"name":"Ivan Rakiti\u0107","pos":["CM"],"rating":86},{"name":"Messi","pos":["RW","ST"],"rating":98},{"name":"Luis Su\u00e1rez","pos":["ST"],"rating":93},{"name":"Neymar","pos":["LW","ST"],"rating":93},{"name":"Pedro","pos":["RW","LW"],"rating":81},{"name":"Rafinha","pos":["CM","RM"],"rating":76},{"name":"Aleix Vidal","pos":["RB","RM"],"rating":74}]},{"id":"bayern_munich_15_19","club":"Bayern Munich","era":"2015-19","rating":91,"players":[{"name":"Manuel Neuer","pos":["GK"],"rating":93},{"name":"Sven Ulreich","pos":["GK"],"rating":78},{"name":"Philipp Lahm","pos":["RB","LB"],"rating":89},{"name":"David Alaba","pos":["LB","CB"],"rating":88},{"name":"Jerome Boateng","pos":["CB"],"rating":88},{"name":"Mats Hummels","pos":["CB"],"rating":88},{"name":"Rafinha","pos":["RB"],"rating":78},{"name":"Xabi Alonso","pos":["CM"],"rating":87},{"name":"Joshua Kimmich","pos":["CM","RB"],"rating":86},{"name":"Thiago Alc\u00e2ntara","pos":["CM"],"rating":88},{"name":"Robben","pos":["RW","LW"],"rating":88},{"name":"Franck Rib\u00e9ry","pos":["LW","RM","LM"],"rating":87},{"name":"Thomas M\u00fcller","pos":["RW","ST"],"rating":87},{"name":"Robert Lewandowski","pos":["ST"],"rating":92},{"name":"Arturo Vidal","pos":["CM"],"rating":85},{"name":"James Rodr\u00edguez","pos":["CM","RW"],"rating":86},{"name":"Kingsley Coman","pos":["LW","RW"],"rating":82},{"name":"Sandro Wagner","pos":["ST"],"rating":77}]},{"id":"juventus_15_19","club":"Juventus","era":"2015-19","rating":88,"players":[{"name":"Buffon","pos":["GK"],"rating":89},{"name":"Szczesny","pos":["GK"],"rating":83},{"name":"Giorgio Chiellini","pos":["CB"],"rating":89},{"name":"Leonardo Bonucci","pos":["CB"],"rating":88},{"name":"Andrea Barzagli","pos":["CB","RB"],"rating":84},{"name":"Alex Sandro","pos":["LB"],"rating":85},{"name":"Stephan Lichtsteiner","pos":["RB"],"rating":80},{"name":"Andrea Pirlo","pos":["CM"],"rating":87},{"name":"Arturo Vidal","pos":["CM"],"rating":87},{"name":"Paul Pogba","pos":["CM"],"rating":88},{"name":"Claudio Marchisio","pos":["CM"],"rating":83},{"name":"Miralem Pjani\u0107","pos":["CM"],"rating":86},{"name":"Cristiano Ronaldo","pos":["LW","ST"],"rating":95},{"name":"Gonzalo Higua\u00edn","pos":["ST"],"rating":87},{"name":"Paulo Dybala","pos":["ST","RW"],"rating":87},{"name":"Mario Mand\u017euki\u0107","pos":["ST","LW"],"rating":83},{"name":"Juan Cuadrado","pos":["RM","RW"],"rating":81},{"name":"Douglas Costa","pos":["LW","RW","LM"],"rating":82}]},{"id":"chelsea_15_19","club":"Chelsea","era":"2015-19","rating":85,"players":[{"name":"Thibaut Courtois","pos":["GK"],"rating":90},{"name":"Asmir Begovic","pos":["GK"],"rating":79},{"name":"John Terry","pos":["CB"],"rating":84},{"name":"Gary Cahill","pos":["CB"],"rating":82},{"name":"David Luiz","pos":["CB"],"rating":83},{"name":"Marcos Alonso","pos":["LB","LW"],"rating":80},{"name":"C\u00e9sar Azpilicueta","pos":["RB","CB"],"rating":83},{"name":"Frank Lampard","pos":["CM"],"rating":82},{"name":"Cesc F\u00e0bregas","pos":["CM"],"rating":85},{"name":"N'Golo Kant\u00e9","pos":["CM"],"rating":91},{"name":"Nemanja Mati\u0107","pos":["CM"],"rating":84},{"name":"Eden Hazard","pos":["LW","CM"],"rating":92},{"name":"Willian","pos":["RW","LW","LM","RM"],"rating":82},{"name":"Pedro","pos":["RW","LW"],"rating":80},{"name":"Diego Costa","pos":["ST"],"rating":87},{"name":"\u00c1lvaro Morata","pos":["ST"],"rating":82},{"name":"Olivier Giroud","pos":["ST"],"rating":81},{"name":"Michy Batshuayi","pos":["ST"],"rating":76}]},{"id":"man_utd_15_19","club":"Man Utd","era":"2015-19","rating":83,"players":[{"name":"David De Gea","pos":["GK"],"rating":91},{"name":"Sergio Romero","pos":["GK"],"rating":77},{"name":"Phil Jones","pos":["CB"],"rating":76},{"name":"Chris Smalling","pos":["CB"],"rating":79},{"name":"Eric Bailly","pos":["CB"],"rating":78},{"name":"Luke Shaw","pos":["LB"],"rating":79},{"name":"Antonio Valencia","pos":["RB"],"rating":80},{"name":"Michael Carrick","pos":["CM"],"rating":81},{"name":"Paul Pogba","pos":["CM"],"rating":87},{"name":"Ander Herrera","pos":["CM"],"rating":80},{"name":"Nemanja Mati\u0107","pos":["CM"],"rating":83},{"name":"Wayne Rooney","pos":["ST","LW"],"rating":82},{"name":"Marcus Rashford","pos":["ST","LW"],"rating":83},{"name":"Zlatan Ibrahimovic","pos":["ST"],"rating":88},{"name":"Romelu Lukaku","pos":["ST"],"rating":85},{"name":"Anthony Martial","pos":["LW","ST","LM","RM"],"rating":82},{"name":"Juan Mata","pos":["CM","RW"],"rating":81},{"name":"Henrikh Mkhitaryan","pos":["CM","RW"],"rating":82}]},{"id":"liverpool_15_19","club":"Liverpool","era":"2015-19","rating":89,"players":[{"name":"Simon Mignolet","pos":["GK"],"rating":79},{"name":"Alisson","pos":["GK"],"rating":91},{"name":"Virgil van Dijk","pos":["CB"],"rating":91},{"name":"Dejan Lovren","pos":["CB"],"rating":79},{"name":"Joel Matip","pos":["CB"],"rating":81},{"name":"Andrew Robertson","pos":["LB"],"rating":87},{"name":"Trent Alexander-Arnold","pos":["RB","RM"],"rating":87},{"name":"Jordan Henderson","pos":["CM"],"rating":83},{"name":"Georginio Wijnaldum","pos":["CM"],"rating":84},{"name":"James Milner","pos":["CM","LB"],"rating":81},{"name":"Adam Lallana","pos":["CM","LM"],"rating":79},{"name":"Mohamed Salah","pos":["RW","ST"],"rating":92},{"name":"Roberto Firmino","pos":["ST","LW"],"rating":87},{"name":"Sadio Man\u00e9","pos":["LW","ST"],"rating":90},{"name":"Philippe Coutinho","pos":["CM","LW"],"rating":87},{"name":"Emre Can","pos":["CM"],"rating":79},{"name":"Daniel Sturridge","pos":["ST"],"rating":80},{"name":"Divock Origi","pos":["ST","LW"],"rating":76}]},{"id":"dortmund_15_19","club":"Borussia Dortmund","era":"2015-19","rating":83,"players":[{"name":"Roman B\u00fcrki","pos":["GK"],"rating":82},{"name":"Marwin Hitz","pos":["GK"],"rating":75},{"name":"Mats Hummels","pos":["CB"],"rating":87},{"name":"Sokratis","pos":["CB"],"rating":82},{"name":"Marcel Schmelzer","pos":["LB"],"rating":78},{"name":"\u0141ukasz Piszczek","pos":["RB"],"rating":80},{"name":"Nuri \u015eahin","pos":["CM"],"rating":79},{"name":"Ilkay G\u00fcndogan","pos":["CM"],"rating":84},{"name":"Julian Weigl","pos":["CM"],"rating":79},{"name":"Marco Reus","pos":["LW","CM"],"rating":88},{"name":"Pierre-Emerick Aubameyang","pos":["ST","LW"],"rating":89},{"name":"Henrikh Mkhitaryan","pos":["CM","RW"],"rating":84},{"name":"Christian Pulisic","pos":["LW","CM"],"rating":80},{"name":"Gonzalo Castro","pos":["CM","RM"],"rating":76},{"name":"Andr\u00e9 Sch\u00fcrrle","pos":["LW","ST"],"rating":78},{"name":"Ousmane Demb\u00e9l\u00e9","pos":["LW","RW"],"rating":83},{"name":"Rapha\u00ebl Guerreiro","pos":["LB","CM","LM"],"rating":81},{"name":"Felix Passlack","pos":["RB"],"rating":72}]},{"id":"atletico_madrid_15_19","club":"Atletico Madrid","era":"2015-19","rating":87,"players":[{"name":"Jan Oblak","pos":["GK"],"rating":92},{"name":"Miguel \u00c1ngel Moy\u00e1","pos":["GK"],"rating":76},{"name":"Diego God\u00edn","pos":["CB"],"rating":89},{"name":"Jose Gimenez","pos":["CB"],"rating":84},{"name":"Stefan Savi\u0107","pos":["CB"],"rating":82},{"name":"Filipe Lu\u00eds","pos":["LB"],"rating":84},{"name":"Juanfran","pos":["RB"],"rating":80},{"name":"Gabi","pos":["CM"],"rating":80},{"name":"Sa\u00fal \u00d1\u00edguez","pos":["CM","LM"],"rating":84},{"name":"Koke","pos":["CM","RM"],"rating":85},{"name":"Thomas Partey","pos":["CM"],"rating":82},{"name":"Antoine Griezmann","pos":["ST","LW"],"rating":91},{"name":"Fernando Torres","pos":["ST"],"rating":78},{"name":"Kevin Gameiro","pos":["ST"],"rating":78},{"name":"Angel Correa","pos":["ST","LW"],"rating":78},{"name":"Yannick Carrasco","pos":["LW","LM","RW"],"rating":82},{"name":"Arda Turan","pos":["CM","LM"],"rating":83},{"name":"Tiago","pos":["CM"],"rating":77}]},{"id":"spurs_15_19","club":"Spurs","era":"2015-19","rating":84,"players":[{"name":"Hugo Lloris","pos":["GK"],"rating":88},{"name":"Michel Vorm","pos":["GK"],"rating":76},{"name":"Toby Alderweireld","pos":["CB"],"rating":87},{"name":"Jan Vertonghen","pos":["CB","LB"],"rating":86},{"name":"Davinson S\u00e1nchez","pos":["CB"],"rating":81},{"name":"Kieran Trippier","pos":["RB","RM"],"rating":81},{"name":"Ben Davies","pos":["LB"],"rating":78},{"name":"Eric Dier","pos":["CM","CB"],"rating":79},{"name":"Victor Wanyama","pos":["CM"],"rating":79},{"name":"Mousa Demb\u00e9l\u00e9","pos":["CM"],"rating":83},{"name":"Dele Alli","pos":["CM","ST"],"rating":84},{"name":"Christian Eriksen","pos":["CM","RM","LM"],"rating":87},{"name":"Harry Kane","pos":["ST"],"rating":90},{"name":"Son Heung-min","pos":["LW","ST"],"rating":87},{"name":"Lucas Moura","pos":["RW","LW"],"rating":81},{"name":"Heung-min Son","pos":["LW","ST"],"rating":87},{"name":"Fernando Llorente","pos":["ST"],"rating":77},{"name":"Georges-K\u00e9vin N'Koudou","pos":["LW"],"rating":72}]},{"id":"man_city_15_19","club":"Man City","era":"2015-19","rating":90,"players":[{"name":"Ederson","pos":["GK"],"rating":89},{"name":"Claudio Bravo","pos":["GK"],"rating":79},{"name":"Vincent Kompany","pos":["CB"],"rating":87},{"name":"Nicol\u00e1s Otamendi","pos":["CB"],"rating":83},{"name":"Aymeric Laporte","pos":["CB","LB"],"rating":87},{"name":"Kyle Walker","pos":["RB"],"rating":85},{"name":"Benjamin Mendy","pos":["LB"],"rating":81},{"name":"Fernandinho","pos":["CM"],"rating":86},{"name":"Kevin De Bruyne","pos":["CM","RM"],"rating":93},{"name":"David Silva","pos":["CM","LM"],"rating":89},{"name":"Ilkay G\u00fcndogan","pos":["CM"],"rating":84},{"name":"Raheem Sterling","pos":["LW","RW"],"rating":87},{"name":"Leroy San\u00e9","pos":["LW","RW"],"rating":86},{"name":"Bernardo Silva","pos":["CM","RW"],"rating":87},{"name":"Sergio Ag\u00fcero","pos":["ST"],"rating":91},{"name":"Gabriel Jesus","pos":["ST","LW"],"rating":83},{"name":"Riyad Mahrez","pos":["RW","LW"],"rating":85},{"name":"Fabian Delph","pos":["LB","CM"],"rating":76}]},{"id":"real_madrid_20_24","club":"Real Madrid","era":"2020-24","rating":92,"players":[{"name":"Thibaut Courtois","pos":["GK"],"rating":92},{"name":"Andriy Lunin","pos":["GK"],"rating":80},{"name":"Sergio Ramos","pos":["CB"],"rating":87},{"name":"Varane","pos":["CB"],"rating":87},{"name":"Eder Milit\u00e3o","pos":["CB"],"rating":87},{"name":"David Alaba","pos":["CB","LB"],"rating":86},{"name":"Marcelo","pos":["LB"],"rating":82},{"name":"Ferland Mendy","pos":["LB"],"rating":83},{"name":"Carvajal","pos":["RB"],"rating":84},{"name":"Luka Modri\u0107","pos":["CM"],"rating":91},{"name":"Toni Kroos","pos":["CM"],"rating":90},{"name":"Casemiro","pos":["CM"],"rating":89},{"name":"Eduardo Camavinga","pos":["CM","LB","LM"],"rating":84},{"name":"Federico Valverde","pos":["CM","RM"],"rating":87},{"name":"Aur\u00e9lien Tchouam\u00e9ni","pos":["CM"],"rating":85},{"name":"Vin\u00edcius Jr.","pos":["LW","ST"],"rating":92},{"name":"Rodrygo","pos":["RW","ST"],"rating":87},{"name":"Karim Benzema","pos":["ST"],"rating":92},{"name":"Jude Bellingham","pos":["CM","ST"],"rating":91},{"name":"Brahim D\u00edaz","pos":["CM","RW"],"rating":78}]},{"id":"barcelona_20_24","club":"Barcelona","era":"2020-24","rating":84,"players":[{"name":"Marc-Andr\u00e9 ter Stegen","pos":["GK"],"rating":89},{"name":"I\u00f1aki Pe\u00f1a","pos":["GK"],"rating":76},{"name":"Ronald Ara\u00fajo","pos":["CB","RB"],"rating":87},{"name":"Jules Kound\u00e9","pos":["CB","RB"],"rating":86},{"name":"Andreas Christensen","pos":["CB"],"rating":82},{"name":"Jordi Alba","pos":["LB"],"rating":83},{"name":"Alejandro Balde","pos":["LB"],"rating":82},{"name":"Pedri","pos":["CM"],"rating":89},{"name":"Gavi","pos":["CM"],"rating":87},{"name":"Sergio Busquets","pos":["CM"],"rating":84},{"name":"Frenkie de Jong","pos":["CM"],"rating":87},{"name":"Franck Kessi\u00e9","pos":["CM"],"rating":80},{"name":"Ousmane Demb\u00e9l\u00e9","pos":["RW","LW"],"rating":87},{"name":"Ferran Torres","pos":["LW","ST"],"rating":81},{"name":"Robert Lewandowski","pos":["ST"],"rating":89},{"name":"Memphis Depay","pos":["ST","LW"],"rating":81},{"name":"Ansu Fati","pos":["LW","ST"],"rating":80},{"name":"Raphinha","pos":["RW","RM","LM"],"rating":85}]},{"id":"bayern_munich_20_24","club":"Bayern Munich","era":"2020-24","rating":91,"players":[{"name":"Manuel Neuer","pos":["GK"],"rating":91},{"name":"Sven Ulreich","pos":["GK"],"rating":77},{"name":"Jerome Boateng","pos":["CB"],"rating":84},{"name":"Niklas S\u00fcle","pos":["CB"],"rating":84},{"name":"Dayot Upamecano","pos":["CB"],"rating":85},{"name":"Benjamin Pavard","pos":["CB","RB"],"rating":82},{"name":"Joshua Kimmich","pos":["CM","RB"],"rating":91},{"name":"Alphonso Davies","pos":["LB"],"rating":87},{"name":"Leon Goretzka","pos":["CM"],"rating":86},{"name":"Thiago Alc\u00e2ntara","pos":["CM"],"rating":87},{"name":"Leroy San\u00e9","pos":["RW","LW"],"rating":87},{"name":"Serge Gnabry","pos":["RW","LW"],"rating":86},{"name":"Thomas M\u00fcller","pos":["RW","ST"],"rating":86},{"name":"Kingsley Coman","pos":["LW","RW","LM","RM"],"rating":84},{"name":"Robert Lewandowski","pos":["ST"],"rating":93},{"name":"Eric Maxim Choupo-Moting","pos":["ST"],"rating":78},{"name":"Sadio Man\u00e9","pos":["LW","ST"],"rating":88},{"name":"Jamal Musiala","pos":["CM","LW"],"rating":88}]},{"id":"man_city_20_24","club":"Man City","era":"2020-24","rating":92,"players":[{"name":"Ederson","pos":["GK"],"rating":90},{"name":"Stefan Ortega","pos":["GK"],"rating":78},{"name":"R\u00faben Dias","pos":["CB"],"rating":90},{"name":"Aymeric Laporte","pos":["CB"],"rating":86},{"name":"Stones","pos":["CB","CM"],"rating":85},{"name":"M\u00e1nuel Akanji","pos":["CB"],"rating":84},{"name":"Kyle Walker","pos":["RB"],"rating":85},{"name":"Jo\u00e3o Cancelo","pos":["RB","LB"],"rating":86},{"name":"Oleksandr Zinchenko","pos":["LB","CM"],"rating":80},{"name":"Kevin De Bruyne","pos":["CM","RM"],"rating":93},{"name":"Fernandinho","pos":["CM"],"rating":82},{"name":"Rodri","pos":["CM"],"rating":91},{"name":"Ilkay G\u00fcndogan","pos":["CM"],"rating":85},{"name":"Bernardo Silva","pos":["CM","RW"],"rating":88},{"name":"Raheem Sterling","pos":["LW","RW"],"rating":86},{"name":"Phil Foden","pos":["LW","CM","LM"],"rating":90},{"name":"Riyad Mahrez","pos":["RW","LW"],"rating":86},{"name":"Erling Haaland","pos":["ST"],"rating":94},{"name":"Gabriel Jesus","pos":["ST","LW"],"rating":82},{"name":"Jack Grealish","pos":["LW","CM"],"rating":83}]},{"id":"chelsea_20_24","club":"Chelsea","era":"2020-24","rating":83,"players":[{"name":"Edouard Mendy","pos":["GK"],"rating":86},{"name":"Kepa Arrizabalaga","pos":["GK"],"rating":79},{"name":"Thiago Silva","pos":["CB"],"rating":88},{"name":"Antonio R\u00fcdiger","pos":["CB"],"rating":86},{"name":"Andreas Christensen","pos":["CB"],"rating":82},{"name":"Marcos Alonso","pos":["LB"],"rating":78},{"name":"C\u00e9sar Azpilicueta","pos":["RB","CB"],"rating":80},{"name":"Reece James","pos":["RB","RM"],"rating":86},{"name":"N'Golo Kant\u00e9","pos":["CM"],"rating":88},{"name":"Jorginho","pos":["CM"],"rating":82},{"name":"Mateo Kova\u010di\u0107","pos":["CM"],"rating":83},{"name":"Mason Mount","pos":["CM","LW","LM"],"rating":83},{"name":"Callum Hudson-Odoi","pos":["LW","RW"],"rating":77},{"name":"Hakim Ziyech","pos":["RW","CM"],"rating":81},{"name":"Kai Havertz","pos":["ST","CM"],"rating":84},{"name":"Timo Werner","pos":["ST","LW"],"rating":81},{"name":"Romelu Lukaku","pos":["ST"],"rating":85},{"name":"Christian Pulisic","pos":["LW","RW"],"rating":79}]},{"id":"liverpool_20_24","club":"Liverpool","era":"2020-24","rating":89,"players":[{"name":"Alisson","pos":["GK"],"rating":92},{"name":"Adri\u00e1n","pos":["GK"],"rating":74},{"name":"Virgil van Dijk","pos":["CB"],"rating":91},{"name":"Jo\u00ebl Matip","pos":["CB"],"rating":81},{"name":"Ibrahima Konat\u00e9","pos":["CB"],"rating":84},{"name":"Andrew Robertson","pos":["LB"],"rating":87},{"name":"Trent Alexander-Arnold","pos":["RB","RM"],"rating":89},{"name":"Jordan Henderson","pos":["CM"],"rating":82},{"name":"Georginio Wijnaldum","pos":["CM"],"rating":83},{"name":"Fabinho","pos":["CM"],"rating":87},{"name":"Thiago Alc\u00e2ntara","pos":["CM","LM"],"rating":86},{"name":"Mohamed Salah","pos":["RW","ST"],"rating":93},{"name":"Sadio Man\u00e9","pos":["LW","ST"],"rating":91},{"name":"Roberto Firmino","pos":["ST","LW"],"rating":85},{"name":"Diogo Jota","pos":["ST","LW"],"rating":85},{"name":"Luis D\u00edaz","pos":["LW","ST"],"rating":85},{"name":"Darwin N\u00fa\u00f1ez","pos":["ST","LW"],"rating":83},{"name":"Harvey Elliott","pos":["CM","RM"],"rating":78}]},{"id":"man_utd_20_24","club":"Man Utd","era":"2020-24","rating":79,"players":[{"name":"David De Gea","pos":["GK"],"rating":88},{"name":"Tom Heaton","pos":["GK"],"rating":73},{"name":"Harry Maguire","pos":["CB"],"rating":79},{"name":"Victor Lindel\u00f6f","pos":["CB"],"rating":78},{"name":"Rapha\u00ebl Varane","pos":["CB"],"rating":83},{"name":"Luke Shaw","pos":["LB"],"rating":82},{"name":"Aaron Wan-Bissaka","pos":["RB"],"rating":78},{"name":"Diogo Dalot","pos":["RB","LB"],"rating":79},{"name":"Bruno Fernandes","pos":["CM","ST"],"rating":88},{"name":"Fred","pos":["CM"],"rating":78},{"name":"Scott McTominay","pos":["CM"],"rating":78},{"name":"Cristiano Ronaldo","pos":["ST","RW"],"rating":90},{"name":"Marcus Rashford","pos":["ST","LW"],"rating":85},{"name":"Jadon Sancho","pos":["RW","LW","RM"],"rating":82},{"name":"Anthony Martial","pos":["ST","LW","LM"],"rating":79},{"name":"Edinson Cavani","pos":["ST"],"rating":82},{"name":"Mason Greenwood","pos":["RW","ST"],"rating":78},{"name":"Donny van de Beek","pos":["CM"],"rating":77}]},{"id":"dortmund_20_24","club":"Borussia Dortmund","era":"2020-24","rating":84,"players":[{"name":"Gregor Kobel","pos":["GK"],"rating":84},{"name":"Marwin Hitz","pos":["GK"],"rating":74},{"name":"Mats Hummels","pos":["CB"],"rating":84},{"name":"Nico Schlotterbeck","pos":["CB"],"rating":82},{"name":"Manuel Akanji","pos":["CB"],"rating":83},{"name":"Rapha\u00ebl Guerreiro","pos":["LB","CM","RM"],"rating":82},{"name":"Thomas Meunier","pos":["RB"],"rating":78},{"name":"Julian Brandt","pos":["CM","LW"],"rating":83},{"name":"Jude Bellingham","pos":["CM"],"rating":88},{"name":"Emre Can","pos":["CM","CB"],"rating":78},{"name":"Mahmoud Dahoud","pos":["CM"],"rating":77},{"name":"Erling Haaland","pos":["ST"],"rating":91},{"name":"Donyell Malen","pos":["ST","LW"],"rating":80},{"name":"Giovanni Reyna","pos":["CM","RW"],"rating":78},{"name":"Thorgan Hazard","pos":["LW","LM"],"rating":79},{"name":"Karim Adeyemi","pos":["ST","LW"],"rating":80},{"name":"Jadon Sancho","pos":["RW","LW"],"rating":83},{"name":"Sebastien Haller","pos":["ST"],"rating":78}]},{"id":"atletico_madrid_20_24","club":"Atletico Madrid","era":"2020-24","rating":83,"players":[{"name":"Jan Oblak","pos":["GK"],"rating":91},{"name":"Ivo Grbi\u0107","pos":["GK"],"rating":74},{"name":"Jos\u00e9 Gim\u00e9nez","pos":["CB"],"rating":83},{"name":"Stefan Savi\u0107","pos":["CB"],"rating":81},{"name":"Mario Hermoso","pos":["CB","LB"],"rating":80},{"name":"Filipe Lu\u00eds","pos":["LB"],"rating":79},{"name":"Kieran Trippier","pos":["RB","LB"],"rating":83},{"name":"Marcos Llorente","pos":["CM","RM"],"rating":84},{"name":"Thomas Partey","pos":["CM"],"rating":85},{"name":"Koke","pos":["CM"],"rating":82},{"name":"Sa\u00fal \u00d1\u00edguez","pos":["CM","LM"],"rating":81},{"name":"Antoine Griezmann","pos":["ST","LW"],"rating":88},{"name":"Joao Felix","pos":["ST","LW"],"rating":85},{"name":"Luis Su\u00e1rez","pos":["ST"],"rating":85},{"name":"\u00c1lvaro Morata","pos":["ST"],"rating":82},{"name":"Angel Correa","pos":["ST","LW"],"rating":79},{"name":"Yannick Carrasco","pos":["LW","LM","RW"],"rating":80},{"name":"Geoffrey Kondogbia","pos":["CM"],"rating":79}]},{"id":"spurs_20_24","club":"Spurs","era":"2020-24","rating":80,"players":[{"name":"Hugo Lloris","pos":["GK"],"rating":85},{"name":"Pierluigi Gollini","pos":["GK"],"rating":75},{"name":"Davinson S\u00e1nchez","pos":["CB"],"rating":79},{"name":"Toby Alderweireld","pos":["CB"],"rating":83},{"name":"Eric Dier","pos":["CB","CM"],"rating":78},{"name":"Sergio Reguil\u00f3n","pos":["LB"],"rating":78},{"name":"Matt Doherty","pos":["RB"],"rating":76},{"name":"Pierre-Emile H\u00f8jbjerg","pos":["CM"],"rating":81},{"name":"Tanguy Ndombele","pos":["CM"],"rating":80},{"name":"Rodrigo Bentancur","pos":["CM"],"rating":82},{"name":"Dele Alli","pos":["CM","ST"],"rating":79},{"name":"Christian Eriksen","pos":["CM","RM"],"rating":84},{"name":"Harry Kane","pos":["ST"],"rating":91},{"name":"Son Heung-min","pos":["LW","ST"],"rating":89},{"name":"Lucas Moura","pos":["RW","LW"],"rating":78},{"name":"Giovani Lo Celso","pos":["CM","LW","LM"],"rating":78},{"name":"Heung-min Son","pos":["LW","ST"],"rating":89},{"name":"Richarlison","pos":["ST","LW"],"rating":81}]},{"id":"juventus_20_24","club":"Juventus","era":"2020-24","rating":82,"players":[{"name":"Wojciech Szcz\u0119sny","pos":["GK"],"rating":85},{"name":"Mattia Perin","pos":["GK"],"rating":77},{"name":"Giorgio Chiellini","pos":["CB"],"rating":85},{"name":"Leonardo Bonucci","pos":["CB"],"rating":84},{"name":"Danilo","pos":["RB","CB"],"rating":80},{"name":"Alex Sandro","pos":["LB"],"rating":80},{"name":"Juan Cuadrado","pos":["RM","RB"],"rating":80},{"name":"Rodrigo Bentancur","pos":["CM"],"rating":81},{"name":"Adrien Rabiot","pos":["CM","LM"],"rating":81},{"name":"Arthur Melo","pos":["CM"],"rating":78},{"name":"Weston McKennie","pos":["CM"],"rating":78},{"name":"Cristiano Ronaldo","pos":["ST","LW"],"rating":92},{"name":"Paulo Dybala","pos":["ST","RW"],"rating":86},{"name":"\u00c1lvaro Morata","pos":["ST"],"rating":81},{"name":"Federico Chiesa","pos":["RW","LW"],"rating":85},{"name":"Dejan Kulusevski","pos":["RW","CM"],"rating":80},{"name":"Moise Kean","pos":["ST"],"rating":77},{"name":"Federico Bernardeschi","pos":["RW","CM"],"rating":76}]},{"id":"inter_milan_20_24","club":"Inter Milan","era":"2020-24","rating":86,"players":[{"name":"Samir Handanovi\u0107","pos":["GK"],"rating":83},{"name":"Andr\u00e9 Onana","pos":["GK"],"rating":85},{"name":"Milan \u0160kriniar","pos":["CB"],"rating":87},{"name":"Alessandro Bastoni","pos":["CB","LB"],"rating":86},{"name":"Stefan de Vrij","pos":["CB"],"rating":83},{"name":"Denzel Dumfries","pos":["RB","RM"],"rating":83},{"name":"Federico Dimarco","pos":["LB","LM"],"rating":82},{"name":"Nicolo Barella","pos":["CM"],"rating":88},{"name":"Marcelo Brozovi\u0107","pos":["CM"],"rating":85},{"name":"Hakan \u00c7alhano\u011flu","pos":["CM"],"rating":85},{"name":"Roberto Gagliardini","pos":["CM"],"rating":75},{"name":"Ivan Peri\u0161i\u0107","pos":["LW","LM","RW"],"rating":84},{"name":"Edin D\u017eeko","pos":["ST"],"rating":81},{"name":"Romelu Lukaku","pos":["ST"],"rating":87},{"name":"Lautaro Mart\u00ednez","pos":["ST"],"rating":88},{"name":"Joaqu\u00edn Correa","pos":["ST","LW"],"rating":78},{"name":"Alexis S\u00e1nchez","pos":["ST","LW"],"rating":79},{"name":"Matteo Darmian","pos":["RB","LB"],"rating":77}]},{"id":"ajax_90_94","club":"Ajax","era":"1990-94","rating":87,"players":[{"name":"Van der Sar","pos":["GK"],"rating":86},{"name":"Blind","pos":["LB","CB"],"rating":80},{"name":"Rijkaard","pos":["CB","CM"],"rating":87},{"name":"F. de Boer","pos":["CB"],"rating":85},{"name":"R. de Boer","pos":["RB","CM"],"rating":82},{"name":"Davids","pos":["CM"],"rating":86},{"name":"Litmanen","pos":["CM","LW"],"rating":87},{"name":"Overmars","pos":["LW"],"rating":88},{"name":"Kluivert","pos":["ST"],"rating":86},{"name":"Petric","pos":["ST"],"rating":79},{"name":"Musampa","pos":["LM","LW"],"rating":78},{"name":"Seedorf","pos":["CM"],"rating":85},{"name":"Bogarde","pos":["CB","LB"],"rating":79},{"name":"Silooy","pos":["RB"],"rating":78},{"name":"Finidi","pos":["RW"],"rating":84}]},{"id":"ajax_95_99","club":"Ajax","era":"1995-99","rating":85,"players":[{"name":"Van der Sar","pos":["GK"],"rating":88},{"name":"Blind","pos":["LB","CB"],"rating":81},{"name":"F. de Boer","pos":["CB"],"rating":86},{"name":"Reiziger","pos":["RB"],"rating":82},{"name":"Stam","pos":["CB"],"rating":84},{"name":"Davids","pos":["CM"],"rating":87},{"name":"Seedorf","pos":["CM"],"rating":86},{"name":"Litmanen","pos":["CM","LW"],"rating":86},{"name":"Overmars","pos":["LW"],"rating":89},{"name":"Kluivert","pos":["ST"],"rating":87},{"name":"R. de Boer","pos":["RB","CM"],"rating":83},{"name":"Finidi","pos":["RW"],"rating":83},{"name":"Scholten","pos":["CB"],"rating":78},{"name":"Babangida","pos":["LW","RW"],"rating":79}]},{"id":"psg_15_19","club":"PSG","era":"2015-19","rating":89,"players":[{"name":"Areola","pos":["GK"],"rating":83},{"name":"Maxwell","pos":["LB"],"rating":82},{"name":"Bernat","pos":["LB"],"rating":82},{"name":"Marquinhos","pos":["CB"],"rating":88},{"name":"Thiago Silva","pos":["CB"],"rating":91},{"name":"Meunier","pos":["RB"],"rating":82},{"name":"Verratti","pos":["CM"],"rating":89},{"name":"Rabiot","pos":["CM"],"rating":83},{"name":"Matuidi","pos":["CM"],"rating":84},{"name":"Di Maria","pos":["LW","RW"],"rating":88},{"name":"Cavani","pos":["ST"],"rating":89},{"name":"Neymar","pos":["LW","ST"],"rating":94},{"name":"Mbappe","pos":["ST","LW"],"rating":92},{"name":"Lucas Moura","pos":["RW","LW"],"rating":82}]},{"id":"psg_20_24","club":"PSG","era":"2020-24","rating":90,"players":[{"name":"Navas","pos":["GK"],"rating":87},{"name":"Donnarumma","pos":["GK"],"rating":88},{"name":"Bernat","pos":["LB"],"rating":82},{"name":"Mendes","pos":["LB"],"rating":85},{"name":"Marquinhos","pos":["CB"],"rating":89},{"name":"Kimpembe","pos":["CB"],"rating":83},{"name":"Hakimi","pos":["RB"],"rating":87},{"name":"Verratti","pos":["CM"],"rating":88},{"name":"Vitinha","pos":["CM"],"rating":84},{"name":"Fabian Ruiz","pos":["CM"],"rating":84},{"name":"Neymar","pos":["LW","ST"],"rating":91},{"name":"Mbappe","pos":["ST","LW"],"rating":96},{"name":"Messi","pos":["RW","ST"],"rating":91},{"name":"Di Maria","pos":["LW","RW"],"rating":85},{"name":"Ramos","pos":["CB"],"rating":85}]},{"id":"lyon_00_04","club":"Lyon","era":"2000-04","rating":80,"players":[{"name":"Coupet","pos":["GK"],"rating":83},{"name":"Berthod","pos":["LB"],"rating":76},{"name":"Deflandre","pos":["RB"],"rating":77},{"name":"Blanc","pos":["CB"],"rating":83},{"name":"Edmilson","pos":["CB","CM"],"rating":81},{"name":"Juninho","pos":["CM"],"rating":87},{"name":"Essien","pos":["CM"],"rating":84},{"name":"Malouda","pos":["LM","LW"],"rating":82},{"name":"Wiltord","pos":["LW","ST"],"rating":82},{"name":"Elber","pos":["ST"],"rating":83},{"name":"Luyindula","pos":["ST","RW"],"rating":78},{"name":"Diatta","pos":["RW"],"rating":77},{"name":"Reveillere","pos":["RB"],"rating":78},{"name":"Muller","pos":["CB"],"rating":79}]},{"id":"lyon_05_09","club":"Lyon","era":"2005-09","rating":82,"players":[{"name":"Coupet","pos":["GK"],"rating":84},{"name":"Grosso","pos":["LB"],"rating":80},{"name":"Reveillere","pos":["RB"],"rating":79},{"name":"Squillaci","pos":["CB"],"rating":80},{"name":"Cris","pos":["CB"],"rating":82},{"name":"Juninho","pos":["CM"],"rating":86},{"name":"Toulalan","pos":["CM"],"rating":81},{"name":"Malouda","pos":["LM","LW"],"rating":83},{"name":"Benzema","pos":["ST"],"rating":85},{"name":"Govou","pos":["RW"],"rating":80},{"name":"Fred","pos":["CM"],"rating":80},{"name":"Kallstrom","pos":["CM"],"rating":79},{"name":"Pjanic","pos":["CM"],"rating":81},{"name":"Keita","pos":["LW","ST"],"rating":79}]},{"id":"valencia_00_04","club":"Valencia","era":"2000-04","rating":83,"players":[{"name":"Canizares","pos":["GK"],"rating":86},{"name":"Carboni","pos":["LB"],"rating":78},{"name":"Ayala","pos":["CB"],"rating":83},{"name":"Pellegrino","pos":["CB"],"rating":80},{"name":"Angloma","pos":["RB"],"rating":79},{"name":"Baraja","pos":["CM"],"rating":82},{"name":"Albelda","pos":["CM"],"rating":81},{"name":"Mendieta","pos":["RM","CM"],"rating":85},{"name":"Kily Gonzalez","pos":["LM","LW"],"rating":81},{"name":"Carew","pos":["ST"],"rating":80},{"name":"Aimar","pos":["CM","LW"],"rating":84},{"name":"Rufete","pos":["CM","RW"],"rating":79},{"name":"Mista","pos":["ST"],"rating":80},{"name":"Vicente","pos":["LW"],"rating":82},{"name":"Villa","pos":["ST"],"rating":83}]},{"id":"marseille_90_94","club":"Marseille","era":"1990-94","rating":83,"players":[{"name":"Barthez","pos":["GK"],"rating":85},{"name":"Di Meco","pos":["LB"],"rating":80},{"name":"Desailly","pos":["CB","CM"],"rating":85},{"name":"Blanc","pos":["CB"],"rating":84},{"name":"Angloma","pos":["RB"],"rating":80},{"name":"Deschamps","pos":["CM"],"rating":83},{"name":"Sauzee","pos":["CM"],"rating":81},{"name":"Waddle","pos":["RW","CM"],"rating":86},{"name":"Pele","pos":["CM","LM"],"rating":80},{"name":"Voller","pos":["ST"],"rating":85},{"name":"Papin","pos":["ST"],"rating":88},{"name":"Boli","pos":["CB"],"rating":82},{"name":"Eydelie","pos":["LM","CM"],"rating":78},{"name":"Thomas","pos":["RW"],"rating":79}]},{"id":"monaco_00_04","club":"Monaco","era":"2000-04","rating":82,"players":[{"name":"Roma","pos":["GK"],"rating":83},{"name":"Evra","pos":["LB"],"rating":83},{"name":"Givet","pos":["CB"],"rating":78},{"name":"Rodriguez","pos":["CB"],"rating":79},{"name":"Ibarra","pos":["RB"],"rating":77},{"name":"Zikos","pos":["CM"],"rating":79},{"name":"Makelele","pos":["CM"],"rating":88},{"name":"Bernardi","pos":["CM"],"rating":80},{"name":"Rothen","pos":["LM","LW"],"rating":82},{"name":"Nonda","pos":["ST"],"rating":81},{"name":"Morientes","pos":["ST"],"rating":84},{"name":"Prso","pos":["ST"],"rating":80},{"name":"Saviola","pos":["ST","RW"],"rating":82},{"name":"Squillaci","pos":["CB"],"rating":79}]},{"id":"monaco_15_19","club":"Monaco","era":"2015-19","rating":83,"players":[{"name":"Subasic","pos":["GK"],"rating":83},{"name":"Mendy","pos":["LB"],"rating":82},{"name":"Glik","pos":["CB"],"rating":82},{"name":"Jemerson","pos":["CB"],"rating":79},{"name":"Sidibe","pos":["RB"],"rating":80},{"name":"Fabinho","pos":["CM","RB"],"rating":85},{"name":"Moutinho","pos":["CM"],"rating":83},{"name":"Bakayoko","pos":["CM"],"rating":80},{"name":"Lemar","pos":["LW","CM"],"rating":83},{"name":"Mbappe","pos":["ST","LW"],"rating":88},{"name":"Falcao","pos":["ST"],"rating":85},{"name":"Bernardo Silva","pos":["RW","CM"],"rating":86},{"name":"Germain","pos":["ST"],"rating":78}]},{"id":"napoli_20_24","club":"Napoli","era":"2020-24","rating":84,"players":[{"name":"Ospina","pos":["GK"],"rating":83},{"name":"Meret","pos":["GK"],"rating":82},{"name":"Mario Rui","pos":["LB"],"rating":81},{"name":"Rrahmani","pos":["CB"],"rating":82},{"name":"Koulibaly","pos":["CB"],"rating":88},{"name":"Di Lorenzo","pos":["RB"],"rating":84},{"name":"Fabian Ruiz","pos":["CM"],"rating":84},{"name":"Lobotka","pos":["CM"],"rating":84},{"name":"Anguissa","pos":["CM"],"rating":84},{"name":"Zielinski","pos":["CM"],"rating":83},{"name":"Insigne","pos":["LW"],"rating":85},{"name":"Politano","pos":["RW"],"rating":81},{"name":"Osimhen","pos":["ST"],"rating":88},{"name":"Lozano","pos":["RW"],"rating":81},{"name":"Kvara","pos":["LW"],"rating":87}]},{"id":"celtic_00_04","club":"Celtic","era":"2000-04","rating":74,"players":[{"name":"Douglas","pos":["GK"],"rating":75},{"name":"Mjallby","pos":["CB"],"rating":76},{"name":"Balde","pos":["LB"],"rating":76},{"name":"Valgaeren","pos":["CB"],"rating":75},{"name":"Agathe","pos":["RB"],"rating":77},{"name":"Petrov","pos":["CM","LM"],"rating":78},{"name":"Lennon","pos":["CM"],"rating":76},{"name":"Lambert","pos":["CM"],"rating":77},{"name":"Thompson","pos":["LM","CM"],"rating":76},{"name":"Larsson","pos":["ST","LW"],"rating":83},{"name":"Sutton","pos":["ST"],"rating":79},{"name":"Hartson","pos":["ST"],"rating":78},{"name":"Maloney","pos":["LW","CM"],"rating":76},{"name":"Smith","pos":["RW"],"rating":74}]},{"id":"shakhtar_05_09","club":"Shakhtar","era":"2005-09","rating":79,"players":[{"name":"Pyatov","pos":["GK"],"rating":81},{"name":"Rat","pos":["LB"],"rating":78},{"name":"Kucher","pos":["CB"],"rating":78},{"name":"Chygrynskiy","pos":["CB"],"rating":79},{"name":"Srna","pos":["RB","RM"],"rating":83},{"name":"Fernandinho","pos":["CM"],"rating":82},{"name":"Hubschman","pos":["CM"],"rating":78},{"name":"Ilsinho","pos":["LM","LW"],"rating":79},{"name":"Jadson","pos":["CM","RW"],"rating":80},{"name":"Luiz Adriano","pos":["ST"],"rating":79},{"name":"Brandao","pos":["ST"],"rating":78},{"name":"Willian","pos":["RW","LW"],"rating":81},{"name":"Douglas Costa","pos":["LW","RW"],"rating":80},{"name":"Elano","pos":["CM","RW"],"rating":82}]},{"id":"shakhtar_10_14","club":"Shakhtar","era":"2010-14","rating":81,"players":[{"name":"Pyatov","pos":["GK"],"rating":82},{"name":"Rat","pos":["LB"],"rating":79},{"name":"Kucher","pos":["CB"],"rating":80},{"name":"Rakitskiy","pos":["CB"],"rating":81},{"name":"Srna","pos":["RB","RM"],"rating":84},{"name":"Fernandinho","pos":["CM"],"rating":85},{"name":"Hubschman","pos":["CM"],"rating":79},{"name":"Mkhitaryan","pos":["CM","RW"],"rating":84},{"name":"Willian","pos":["RW","LW"],"rating":83},{"name":"Douglas Costa","pos":["LW","RW"],"rating":83},{"name":"Luiz Adriano","pos":["ST"],"rating":82},{"name":"Alex Teixeira","pos":["ST","CM"],"rating":81},{"name":"Bernard","pos":["LW"],"rating":82},{"name":"Taison","pos":["LW","RW"],"rating":80}]},{"id":"benfica_05_09","club":"Benfica","era":"2005-09","rating":78,"players":[{"name":"Quim","pos":["GK"],"rating":79},{"name":"Luisao","pos":["CB"],"rating":82},{"name":"Anderson Luis","pos":["CB"],"rating":79},{"name":"Alcides","pos":["LB"],"rating":76},{"name":"Bosingwa","pos":["RB"],"rating":79},{"name":"Petit","pos":["CM"],"rating":78},{"name":"Simao","pos":["LW","RM"],"rating":82},{"name":"Nuno Gomes","pos":["ST"],"rating":80},{"name":"Rui Costa","pos":["CM"],"rating":83},{"name":"Di Maria","pos":["LW","RW"],"rating":80},{"name":"Cardozo","pos":["ST"],"rating":80},{"name":"Aimar","pos":["CM","LW"],"rating":81},{"name":"Nuno Assis","pos":["CM","RW"],"rating":77}]},{"id":"benfica_10_14","club":"Benfica","era":"2010-14","rating":80,"players":[{"name":"Artur","pos":["GK"],"rating":79},{"name":"Emerson","pos":["LB"],"rating":78},{"name":"Luisao","pos":["CB"],"rating":83},{"name":"Garay","pos":["CB"],"rating":81},{"name":"Almeida","pos":["RB"],"rating":78},{"name":"Witsel","pos":["CM"],"rating":83},{"name":"Aimar","pos":["CM","LW"],"rating":80},{"name":"Perez","pos":["CM"],"rating":78},{"name":"Salvio","pos":["RW"],"rating":80},{"name":"Cardozo","pos":["ST"],"rating":81},{"name":"Lima","pos":["ST"],"rating":79},{"name":"Di Maria","pos":["LW","RW"],"rating":84},{"name":"Gaitan","pos":["LW","CM"],"rating":82},{"name":"Rodrigo","pos":["ST","LW"],"rating":80}]},{"id":"psv_85_89","club":"PSV","era":"1985-89","rating":84,"players":[{"name":"Van Breukelen","pos":["GK"],"rating":83},{"name":"Van Aerle","pos":["RB"],"rating":79},{"name":"Koeman","pos":["CB"],"rating":86},{"name":"Heintze","pos":["CB"],"rating":79},{"name":"Van Tiggelen","pos":["LB","CB"],"rating":80},{"name":"Vanenburg","pos":["CM","LW"],"rating":82},{"name":"Lerby","pos":["CM"],"rating":81},{"name":"Gullit","pos":["LW","ST"],"rating":92},{"name":"Van Basten","pos":["ST"],"rating":94},{"name":"Kieft","pos":["ST"],"rating":82},{"name":"Faber","pos":["CM"],"rating":78},{"name":"Gerets","pos":["RB"],"rating":80},{"name":"Janssen","pos":["CM"],"rating":79}]},{"id":"ac_milan_85_89","club":"AC Milan","era":"1985-89","rating":88,"players":[{"name":"Giovanni Galli","pos":["GK"],"rating":82},{"name":"Tassotti","pos":["RB","CB"],"rating":83},{"name":"Baresi","pos":["CB"],"rating":94},{"name":"Costacurta","pos":["CB"],"rating":88},{"name":"Maldini","pos":["LB"],"rating":90},{"name":"Ancelotti","pos":["CM"],"rating":83},{"name":"Donadoni","pos":["CM","RM"],"rating":82},{"name":"Evani","pos":["LM","CM"],"rating":80},{"name":"Gullit","pos":["LW","ST"],"rating":93},{"name":"Van Basten","pos":["ST"],"rating":95},{"name":"Rijkaard","pos":["CM","CB"],"rating":88},{"name":"Savicevic","pos":["LW","RW"],"rating":87}]},{"id":"real_madrid_85_89","club":"Real Madrid","era":"1985-89","rating":85,"players":[{"name":"Buyo","pos":["GK"],"rating":80},{"name":"Chendo","pos":["RB"],"rating":79},{"name":"Hierro","pos":["CB","CM"],"rating":83},{"name":"Sanchis","pos":["CB"],"rating":82},{"name":"Camacho","pos":["LB","CM"],"rating":82},{"name":"Martin Vazquez","pos":["CM"],"rating":82},{"name":"Michel","pos":["CM"],"rating":84},{"name":"Schuster","pos":["CM"],"rating":86},{"name":"Butragueno","pos":["ST"],"rating":87},{"name":"Santillana","pos":["ST"],"rating":84},{"name":"Hugo Sanchez","pos":["ST"],"rating":88},{"name":"Gordillo","pos":["LM","LW"],"rating":82},{"name":"Juanito","pos":["RW","CM"],"rating":81}]},{"id":"porto_05_09","club":"Porto","era":"2005-09","rating":79,"players":[{"name":"Helton","pos":["GK"],"rating":80},{"name":"Bruno Alves","pos":["CB"],"rating":82},{"name":"Pepe","pos":["CB"],"rating":84},{"name":"Bosingwa","pos":["RB"],"rating":80},{"name":"Fucile","pos":["LB"],"rating":77},{"name":"Lucho Gonzalez","pos":["CM"],"rating":82},{"name":"Raul Meireles","pos":["CM"],"rating":81},{"name":"Quaresma","pos":["RW"],"rating":82},{"name":"Lisandro Lopez","pos":["ST"],"rating":80},{"name":"Hulk","pos":["ST","RW"],"rating":83},{"name":"Postiga","pos":["ST"],"rating":78},{"name":"Deco","pos":["CM"],"rating":84},{"name":"Anderson","pos":["CM"],"rating":80}]},{"id":"porto_10_14","club":"Porto","era":"2010-14","rating":80,"players":[{"name":"Helton","pos":["GK"],"rating":80},{"name":"Bruno Alves","pos":["CB"],"rating":83},{"name":"Mangala","pos":["CB"],"rating":82},{"name":"Danilo","pos":["RB"],"rating":81},{"name":"Alex Sandro","pos":["LB"],"rating":83},{"name":"Moutinho","pos":["CM"],"rating":84},{"name":"Fernando","pos":["CM"],"rating":82},{"name":"Quaresma","pos":["RW"],"rating":81},{"name":"James Rodriguez","pos":["CM","RW"],"rating":86},{"name":"Hulk","pos":["ST","RW"],"rating":84},{"name":"Falcao","pos":["ST"],"rating":89},{"name":"Martinez","pos":["ST"],"rating":80}]},{"id":"spurs_10_14","club":"Spurs","era":"2010-14","rating":79,"players":[{"name":"Lloris","pos":["GK"],"rating":85},{"name":"Assou-Ekotto","pos":["LB"],"rating":77},{"name":"Gallas","pos":["CB"],"rating":79},{"name":"Dawson","pos":["CB"],"rating":78},{"name":"Walker","pos":["RB"],"rating":81},{"name":"Parker","pos":["CM"],"rating":79},{"name":"Dembele","pos":["CM"],"rating":82},{"name":"Modric","pos":["CM"],"rating":87},{"name":"Lennon","pos":["RM","RW"],"rating":79},{"name":"Bale","pos":["LW","LM"],"rating":89},{"name":"Van der Vaart","pos":["CM","RW"],"rating":83},{"name":"Defoe","pos":["ST"],"rating":80},{"name":"Adebayor","pos":["ST"],"rating":81}]},{"id":"arsenal_15_19","club":"Arsenal","era":"2015-19","rating":80,"players":[{"name":"Cech","pos":["GK"],"rating":84},{"name":"Monreal","pos":["LB"],"rating":80},{"name":"Koscielny","pos":["CB"],"rating":83},{"name":"Mustafi","pos":["CB"],"rating":79},{"name":"Bellerin","pos":["RB"],"rating":82},{"name":"Xhaka","pos":["CM"],"rating":81},{"name":"Ramsey","pos":["CM"],"rating":82},{"name":"Ozil","pos":["CM","RW"],"rating":87},{"name":"Alexis","pos":["LW","ST"],"rating":87},{"name":"Welbeck","pos":["ST","LW"],"rating":78},{"name":"Giroud","pos":["ST"],"rating":81},{"name":"Walcott","pos":["RW"],"rating":79},{"name":"Lacazette","pos":["ST"],"rating":83},{"name":"Aubameyang","pos":["ST","LW"],"rating":86}]},{"id":"arsenal_20_24","club":"Arsenal","era":"2020-24","rating":82,"players":[{"name":"Ramsdale","pos":["GK"],"rating":82},{"name":"Zinchenko","pos":["LB","CM"],"rating":82},{"name":"White","pos":["CB","RB"],"rating":82},{"name":"Saliba","pos":["CB"],"rating":86},{"name":"Gabriel","pos":["CB"],"rating":84},{"name":"Saka","pos":["RW","RB"],"rating":88},{"name":"Odegaard","pos":["CM"],"rating":87},{"name":"Partey","pos":["CM"],"rating":83},{"name":"Havertz","pos":["CM","ST"],"rating":82},{"name":"Trossard","pos":["LW","ST"],"rating":82},{"name":"Martinelli","pos":["LW","ST"],"rating":84},{"name":"Jesus","pos":["ST"],"rating":82},{"name":"Rice","pos":["CM"],"rating":86}]},{"id":"bayern_00_04","club":"Bayern Munich","era":"2000-04","rating":87,"players":[{"name":"Kahn","pos":["GK"],"rating":93},{"name":"Lizarazu","pos":["LB"],"rating":85},{"name":"Linke","pos":["CB"],"rating":82},{"name":"Kuffour","pos":["CB"],"rating":81},{"name":"Sagnol","pos":["RB"],"rating":83},{"name":"Hargreaves","pos":["CM"],"rating":81},{"name":"Jeremies","pos":["CM"],"rating":81},{"name":"Effenberg","pos":["CM"],"rating":85},{"name":"Salihamidzic","pos":["CM","RM"],"rating":80},{"name":"Elber","pos":["ST"],"rating":83},{"name":"Ze Roberto","pos":["LM","LB"],"rating":83},{"name":"Ballack","pos":["CM"],"rating":88},{"name":"Makaay","pos":["ST"],"rating":84},{"name":"Scholl","pos":["CM","RW"],"rating":84}]},{"id":"bayern_05_09","club":"Bayern Munich","era":"2005-09","rating":84,"players":[{"name":"Rensing","pos":["GK"],"rating":78},{"name":"Lahm","pos":["LB","RB"],"rating":87},{"name":"Van Buyten","pos":["CB"],"rating":83},{"name":"Lucio","pos":["CB"],"rating":85},{"name":"Sagnol","pos":["RB"],"rating":81},{"name":"Van Bommel","pos":["CM"],"rating":83},{"name":"Schweinsteiger","pos":["CM"],"rating":86},{"name":"Ze Roberto","pos":["LM","LB"],"rating":82},{"name":"Ribery","pos":["LW"],"rating":86},{"name":"Klose","pos":["ST"],"rating":83},{"name":"Toni","pos":["ST"],"rating":83},{"name":"Podolski","pos":["LW","ST"],"rating":82},{"name":"Ballack","pos":["CM"],"rating":87}]},{"id":"inter_milan_85_89","club":"Inter Milan","era":"1985-89","rating":84,"players":[{"name":"Zenga","pos":["GK"],"rating":85},{"name":"Bergomi","pos":["CB","RB"],"rating":85},{"name":"Ferri","pos":["CB"],"rating":82},{"name":"Passarella","pos":["CB"],"rating":84},{"name":"Brehme","pos":["LB"],"rating":86},{"name":"Berti","pos":["CM"],"rating":82},{"name":"Matthaus","pos":["CM"],"rating":92},{"name":"Ancelotti","pos":["CM"],"rating":82},{"name":"Klinsmann","pos":["ST"],"rating":86},{"name":"Serena","pos":["ST"],"rating":80},{"name":"Caniggia","pos":["ST","RW"],"rating":84},{"name":"Diaz","pos":["CM","LM"],"rating":80}]},{"id":"juventus_85_89","club":"Juventus","era":"1985-89","rating":86,"players":[{"name":"Tacconi","pos":["GK"],"rating":83},{"name":"Cabrini","pos":["LB"],"rating":84},{"name":"Scirea","pos":["CB"],"rating":87},{"name":"Brio","pos":["CB"],"rating":82},{"name":"Gentile","pos":["RB","CB"],"rating":83},{"name":"Tardelli","pos":["CM"],"rating":83},{"name":"Boniek","pos":["RW","ST"],"rating":85},{"name":"Platini","pos":["CM"],"rating":94},{"name":"Laudrup","pos":["RW","CM"],"rating":87},{"name":"Rossi","pos":["ST"],"rating":86},{"name":"Serena","pos":["ST"],"rating":80},{"name":"De Agostini","pos":["LB","CM"],"rating":79}]},{"id":"aston_villa_80_84","club":"Aston Villa","era":"1980-84","rating":74,"players":[{"name":"Rimmer","pos":["GK"],"rating":75},{"name":"Swain","pos":["RB"],"rating":73},{"name":"Evans","pos":["CB"],"rating":74},{"name":"McNaught","pos":["CB"],"rating":73},{"name":"Gibson","pos":["LB"],"rating":72},{"name":"Bremner","pos":["CM"],"rating":75},{"name":"Mortimer","pos":["CM"],"rating":77},{"name":"Cowans","pos":["CM","LM"],"rating":78},{"name":"Morley","pos":["LW"],"rating":76},{"name":"Shaw","pos":["RW","ST"],"rating":74},{"name":"Withe","pos":["ST"],"rating":78},{"name":"Walters","pos":["ST","LW"],"rating":74},{"name":"Blair","pos":["CM"],"rating":72},{"name":"Spink","pos":["GK"],"rating":74}]},{"id":"hamburg_80_84","club":"Hamburg","era":"1980-84","rating":78,"players":[{"name":"Stein","pos":["GK"],"rating":78},{"name":"Kaltz","pos":["RB"],"rating":80},{"name":"Buljan","pos":["CB"],"rating":77},{"name":"Hieronymus","pos":["CB"],"rating":75},{"name":"Wehmeyer","pos":["LB"],"rating":74},{"name":"Magath","pos":["CM"],"rating":83},{"name":"Milewski","pos":["CM"],"rating":76},{"name":"Jakobs","pos":["LM","CM"],"rating":77},{"name":"Keegan","pos":["ST","RW"],"rating":88},{"name":"Hrubesch","pos":["ST"],"rating":82},{"name":"Reimann","pos":["LW","ST"],"rating":76},{"name":"Groh","pos":["RM","CM"],"rating":74},{"name":"Hartwig","pos":["CB"],"rating":74}]},{"id":"deportivo_00_04","club":"Deportivo","era":"2000-04","rating":77,"players":[{"name":"Molina","pos":["GK"],"rating":80},{"name":"Romero","pos":["LB"],"rating":76},{"name":"Cesar","pos":["CB"],"rating":78},{"name":"Hector","pos":["CB"],"rating":76},{"name":"Capdevila","pos":["RB","LB"],"rating":78},{"name":"Mauro Silva","pos":["CM"],"rating":78},{"name":"Valeron","pos":["CM"],"rating":83},{"name":"Sergio","pos":["CM"],"rating":76},{"name":"Trist\u00e1n","pos":["ST"],"rating":80},{"name":"Pandiani","pos":["ST"],"rating":77},{"name":"Fran","pos":["LW","CM"],"rating":79},{"name":"Makaay","pos":["ST"],"rating":82},{"name":"Acu\u00f1a","pos":["LM","CM"],"rating":76},{"name":"Scaloni","pos":["RB","RM"],"rating":74}]},{"id":"galatasaray_00_04","club":"Galatasaray","era":"2000-04","rating":75,"players":[{"name":"Mondragon","pos":["GK"],"rating":77},{"name":"Capone","pos":["LB"],"rating":73},{"name":"B\u00fclent","pos":["CB"],"rating":75},{"name":"Alpay","pos":["CB"],"rating":76},{"name":"Popescu","pos":["RB","CB"],"rating":77},{"name":"Emre Belozoglu","pos":["CM"],"rating":79},{"name":"Sas","pos":["RM","CM"],"rating":78},{"name":"Umit Davala","pos":["LM","CM"],"rating":76},{"name":"Sukur","pos":["ST"],"rating":80},{"name":"Jardel","pos":["ST"],"rating":78},{"name":"Arif","pos":["LW","ST"],"rating":73},{"name":"Korkmaz","pos":["CM"],"rating":74},{"name":"Suat","pos":["RW"],"rating":73}]},{"id":"leverkusen_00_04","club":"Bayer Leverkusen","era":"2000-04","rating":79,"players":[{"name":"Butt","pos":["GK"],"rating":80},{"name":"Placente","pos":["LB"],"rating":76},{"name":"Lucio","pos":["CB"],"rating":85},{"name":"Nowotny","pos":["CB"],"rating":80},{"name":"Zivkovic","pos":["RB"],"rating":77},{"name":"Ballack","pos":["CM"],"rating":88},{"name":"Ramelow","pos":["CM"],"rating":79},{"name":"Schneider","pos":["RM","CM"],"rating":80},{"name":"Basturk","pos":["CM","LM"],"rating":79},{"name":"Neuville","pos":["ST","LW"],"rating":79},{"name":"Ze Roberto","pos":["LM","LB"],"rating":82},{"name":"Berbatov","pos":["ST"],"rating":80},{"name":"Brdaric","pos":["ST"],"rating":74},{"name":"Bobic","pos":["ST"],"rating":76}]},{"id":"rb_leipzig_20_24","club":"RB Leipzig","era":"2020-24","rating":82,"players":[{"name":"Gulacsi","pos":["GK"],"rating":82},{"name":"Angelino","pos":["LB"],"rating":80},{"name":"Upamecano","pos":["CB"],"rating":84},{"name":"Orban","pos":["CB"],"rating":80},{"name":"Mukiele","pos":["RB","CB"],"rating":80},{"name":"Laimer","pos":["CM"],"rating":82},{"name":"Kampl","pos":["CM"],"rating":80},{"name":"Sabitzer","pos":["CM"],"rating":82},{"name":"Nkunku","pos":["LW","ST"],"rating":87},{"name":"Werner","pos":["ST","LW"],"rating":83},{"name":"Forsberg","pos":["LW","CM"],"rating":82},{"name":"Olmo","pos":["CM","LW"],"rating":84},{"name":"Andre Silva","pos":["ST"],"rating":81},{"name":"Szoboszlai","pos":["CM"],"rating":83},{"name":"Sesko","pos":["ST"],"rating":81}]},{"id":"villarreal_05_09","club":"Villarreal","era":"2005-09","rating":79,"players":[{"name":"Barbosa","pos":["GK"],"rating":79},{"name":"Arruabarrena","pos":["LB"],"rating":75},{"name":"Quique Alvarez","pos":["CB"],"rating":77},{"name":"Gonzalo","pos":["CB"],"rating":76},{"name":"Javi Venta","pos":["RB"],"rating":76},{"name":"Marcos Senna","pos":["CM"],"rating":83},{"name":"Cazorla","pos":["CM","LW"],"rating":83},{"name":"Pires","pos":["LW","CM"],"rating":81},{"name":"Riquelme","pos":["CM"],"rating":86},{"name":"Nihat","pos":["ST"],"rating":80},{"name":"Forlan","pos":["ST"],"rating":84},{"name":"Rossi","pos":["ST"],"rating":79},{"name":"Capdevila","pos":["LB"],"rating":79},{"name":"Ibagaza","pos":["RW","CM"],"rating":77}]}]}.squads;
+
+var BADGES={
+  "real_madrid_85_89":"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+  "real_madrid_90_94":"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+  "real_madrid_95_99":"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+  "real_madrid_00_04":"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+  "real_madrid_05_09":"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+  "real_madrid_10_14":"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+  "real_madrid_15_19":"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+  "real_madrid_20_24":"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+  "barcelona_90_94":"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
+  "barcelona_95_99":"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
+  "barcelona_00_04":"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
+  "barcelona_05_09":"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
+  "barcelona_10_14":"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
+  "barcelona_15_19":"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
+  "barcelona_20_24":"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
+  "bayern_85_89":"https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282002%E2%80%932017%29.svg",
+  "bayern_90_94":"https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282002%E2%80%932017%29.svg",
+  "bayern_95_99":"https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282002%E2%80%932017%29.svg",
+  "bayern_00_04":"https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282002%E2%80%932017%29.svg",
+  "bayern_05_09":"https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282002%E2%80%932017%29.svg",
+  "bayern_10_14":"https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282002%E2%80%932017%29.svg",
+  "bayern_15_19":"https://upload.wikimedia.org/wikipedia/commons/b/b6/Bayern_M%C3%BCnchen_Logo_2017.svg",
+  "bayern_20_24":"https://upload.wikimedia.org/wikipedia/commons/b/b6/Bayern_M%C3%BCnchen_Logo_2017.svg",
+  "man_utd_90_94":"https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+  "man_utd_95_99":"https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+  "man_utd_00_04":"https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+  "man_utd_05_09":"https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+  "man_utd_10_14":"https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+  "man_utd_15_19":"https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+  "man_utd_20_24":"https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+  "liverpool_95_99":"https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+  "liverpool_00_04":"https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+  "liverpool_05_09":"https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+  "liverpool_10_14":"https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+  "liverpool_15_19":"https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+  "liverpool_20_24":"https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+  "chelsea_00_04":"https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
+  "chelsea_05_09":"https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
+  "chelsea_10_14":"https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
+  "chelsea_15_19":"https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
+  "chelsea_20_24":"https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
+  "arsenal_95_99":"https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
+  "arsenal_00_04":"https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
+  "arsenal_05_09":"https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
+  "arsenal_10_14":"https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
+  "arsenal_15_19":"https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
+  "arsenal_20_24":"https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
+  "juventus_85_89":"https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg",
+  "juventus_90_94":"https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg",
+  "juventus_95_99":"https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg",
+  "juventus_00_04":"https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg",
+  "juventus_05_09":"https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg",
+  "juventus_10_14":"https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg",
+  "juventus_15_19":"https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg",
+  "juventus_20_24":"https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg",
+  "ac_milan_85_89":"https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
+  "ac_milan_90_94":"https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
+  "ac_milan_95_99":"https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
+  "ac_milan_00_04":"https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
+  "ac_milan_05_09":"https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
+  "ac_milan_10_14":"https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
+  "inter_milan_85_89":"https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
+  "inter_milan_90_94":"https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
+  "inter_milan_95_99":"https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
+  "inter_milan_00_04":"https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
+  "inter_milan_05_09":"https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
+  "inter_milan_10_14":"https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
+  "inter_milan_20_24":"https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
+  "borussia_dortmund_90_94":"https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
+  "borussia_dortmund_95_99":"https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
+  "borussia_dortmund_05_09":"https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
+  "borussia_dortmund_10_14":"https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
+  "borussia_dortmund_15_19":"https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
+  "borussia_dortmund_20_24":"https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
+  "man_city_10_14":"https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
+  "man_city_15_19":"https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
+  "man_city_20_24":"https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
+  "atletico_madrid_05_09":"https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg",
+  "atletico_madrid_10_14":"https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg",
+  "atletico_madrid_15_19":"https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg",
+  "atletico_madrid_20_24":"https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg",
+  "porto_90_94":"https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg",
+  "porto_95_99":"https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg",
+  "porto_00_04":"https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg",
+  "porto_05_09":"https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg",
+  "porto_10_14":"https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg",
+  "ajax_90_94":"https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg",
+  "ajax_95_99":"https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg",
+  "psg_15_19":"https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
+  "psg_20_24":"https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
+  "lyon_00_04":"https://upload.wikimedia.org/wikipedia/en/6/6a/Olympique_Lyonnais_logo.svg",
+  "lyon_05_09":"https://upload.wikimedia.org/wikipedia/en/6/6a/Olympique_Lyonnais_logo.svg",
+  "valencia_00_04":"https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg",
+  "marseille_90_94":"https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_de_Marseille_logo.svg",
+  "monaco_00_04":"https://upload.wikimedia.org/wikipedia/en/b/ba/AS_Monaco_FC.svg",
+  "monaco_15_19":"https://upload.wikimedia.org/wikipedia/en/b/ba/AS_Monaco_FC.svg",
+  "napoli_20_24":"https://upload.wikimedia.org/wikipedia/commons/2/2d/SSC_Napoli_2007.svg",
+  "celtic_00_04":"https://upload.wikimedia.org/wikipedia/en/3/35/Celtic_FC.svg",
+  "shakhtar_05_09":"https://upload.wikimedia.org/wikipedia/en/a/ab/FC_Shakhtar_Donetsk.svg",
+  "shakhtar_10_14":"https://upload.wikimedia.org/wikipedia/en/a/ab/FC_Shakhtar_Donetsk.svg",
+  "benfica_05_09":"https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg",
+  "benfica_10_14":"https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg",
+  "psv_85_89":"https://upload.wikimedia.org/wikipedia/en/0/05/PSV_Eindhoven.svg",
+  "spurs_10_14":"https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg",
+  "spurs_15_19":"https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg",
+  "spurs_20_24":"https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg",
+};
+
+function getBadge(squadId){return BADGES[squadId]||"";}
+function badgeImg(squadId,size){
+  var url=getBadge(squadId);
+  if(!url)return "";
+  var s=size||20;
+  return "<img src=\""+url+"\" width=\""+s+"\" height=\""+s+"\" style=\"object-fit:contain;vertical-align:middle;flex-shrink:0\" onerror=\"this.remove()\">";
+}
+// - FORMATIONS -
+// Each formation: array of slot definitions {id, pos, x, y}
+// x=left%, y=top% (100% = GK end, 0% = attacking end)
+var FORMATIONS={
+  "4-3-3":[
+    {id:"GK",pos:"GK",x:50,y:88},
+    {id:"LB",pos:"LB",x:15,y:72},{id:"CB1",pos:"CB",x:37,y:74},{id:"CB2",pos:"CB",x:63,y:74},{id:"RB",pos:"RB",x:85,y:72},
+    {id:"CM1",pos:"CM",x:25,y:52},{id:"CM2",pos:"CM",x:50,y:55},{id:"CM3",pos:"CM",x:75,y:52},
+    {id:"LW",pos:"LW",x:18,y:28},{id:"ST",pos:"ST",x:50,y:18},{id:"RW",pos:"RW",x:82,y:28}
+  ],
+  "4-4-2":[
+    {id:"GK",pos:"GK",x:50,y:88},
+    {id:"LB",pos:"LB",x:15,y:72},{id:"CB1",pos:"CB",x:37,y:74},{id:"CB2",pos:"CB",x:63,y:74},{id:"RB",pos:"RB",x:85,y:72},
+    {id:"LM",pos:"LM",x:15,y:52},{id:"CM1",pos:"CM",x:37,y:54},{id:"CM2",pos:"CM",x:63,y:54},{id:"RM",pos:"RM",x:85,y:52},
+    {id:"ST1",pos:"ST",x:35,y:20},{id:"ST2",pos:"ST",x:65,y:20}
+  ],
+  "4-2-3-1":[
+    {id:"GK",pos:"GK",x:50,y:88},
+    {id:"LB",pos:"LB",x:15,y:72},{id:"CB1",pos:"CB",x:37,y:74},{id:"CB2",pos:"CB",x:63,y:74},{id:"RB",pos:"RB",x:85,y:72},
+    {id:"CDM1",pos:"CM",x:37,y:58},{id:"CDM2",pos:"CM",x:63,y:58},
+    {id:"LW",pos:"LW",x:18,y:38},{id:"CAM",pos:"CM",x:50,y:36},{id:"RW",pos:"RW",x:82,y:38},
+    {id:"ST",pos:"ST",x:50,y:18}
+  ],
+  "3-5-2":[
+    {id:"GK",pos:"GK",x:50,y:88},
+    {id:"CB1",pos:"CB",x:28,y:74},{id:"CB2",pos:"CB",x:50,y:76},{id:"CB3",pos:"CB",x:72,y:74},
+    {id:"LWB",pos:"LB",x:12,y:54},{id:"CM1",pos:"CM",x:30,y:54},{id:"CM2",pos:"CM",x:50,y:56},{id:"CM3",pos:"CM",x:70,y:54},{id:"RWB",pos:"RB",x:88,y:54},
+    {id:"ST1",pos:"ST",x:35,y:20},{id:"ST2",pos:"ST",x:65,y:20}
+  ],
+  "4-1-4-1":[
+    {id:"GK",pos:"GK",x:50,y:88},
+    {id:"LB",pos:"LB",x:15,y:72},{id:"CB1",pos:"CB",x:37,y:74},{id:"CB2",pos:"CB",x:63,y:74},{id:"RB",pos:"RB",x:85,y:72},
+    {id:"CDM",pos:"CM",x:50,y:60},
+    {id:"LM",pos:"LM",x:15,y:44},{id:"CM1",pos:"CM",x:37,y:46},{id:"CM2",pos:"CM",x:63,y:46},{id:"RM",pos:"RM",x:85,y:44},
+    {id:"ST",pos:"ST",x:50,y:18}
+  ],
+  "3-4-3":[
+    {id:"GK",pos:"GK",x:50,y:88},
+    {id:"CB1",pos:"CB",x:28,y:74},{id:"CB2",pos:"CB",x:50,y:76},{id:"CB3",pos:"CB",x:72,y:74},
+    {id:"LM",pos:"LM",x:15,y:54},{id:"CM1",pos:"CM",x:37,y:56},{id:"CM2",pos:"CM",x:63,y:56},{id:"RM",pos:"RM",x:85,y:54},
+    {id:"LW",pos:"LW",x:18,y:28},{id:"ST",pos:"ST",x:50,y:18},{id:"RW",pos:"RW",x:82,y:28}
+  ],
+  "5-3-2":[
+    {id:"GK",pos:"GK",x:50,y:88},
+    {id:"LWB",pos:"LB",x:10,y:68},{id:"CB1",pos:"CB",x:28,y:74},{id:"CB2",pos:"CB",x:50,y:76},{id:"CB3",pos:"CB",x:72,y:74},{id:"RWB",pos:"RB",x:90,y:68},
+    {id:"CM1",pos:"CM",x:28,y:52},{id:"CM2",pos:"CM",x:50,y:54},{id:"CM3",pos:"CM",x:72,y:52},
+    {id:"ST1",pos:"ST",x:35,y:20},{id:"ST2",pos:"ST",x:65,y:20}
+  ],
+  "4-5-1":[
+    {id:"GK",pos:"GK",x:50,y:88},
+    {id:"LB",pos:"LB",x:15,y:72},{id:"CB1",pos:"CB",x:37,y:74},{id:"CB2",pos:"CB",x:63,y:74},{id:"RB",pos:"RB",x:85,y:72},
+    {id:"LM",pos:"LM",x:12,y:48},{id:"CM1",pos:"CM",x:30,y:50},{id:"CM2",pos:"CM",x:50,y:52},{id:"CM3",pos:"CM",x:70,y:50},{id:"RM",pos:"RM",x:88,y:48},
+    {id:"ST",pos:"ST",x:50,y:18}
+  ],
+  "4-4-2 (diamond)":[
+    {id:"GK",pos:"GK",x:50,y:88},
+    {id:"LB",pos:"LB",x:15,y:72},{id:"CB1",pos:"CB",x:37,y:74},{id:"CB2",pos:"CB",x:63,y:74},{id:"RB",pos:"RB",x:85,y:72},
+    {id:"CDM",pos:"CM",x:50,y:60},
+    {id:"CM1",pos:"CM",x:25,y:48},{id:"CM2",pos:"CM",x:75,y:48},
+    {id:"CAM",pos:"CM",x:50,y:36},
+    {id:"ST1",pos:"ST",x:35,y:20},{id:"ST2",pos:"ST",x:65,y:20}
+  ],
+  "3-6-1":[
+    {id:"GK",pos:"GK",x:50,y:88},
+    {id:"CB1",pos:"CB",x:28,y:74},{id:"CB2",pos:"CB",x:50,y:76},{id:"CB3",pos:"CB",x:72,y:74},
+    {id:"LWB",pos:"LB",x:10,y:56},{id:"CM1",pos:"CM",x:28,y:52},{id:"CM2",pos:"CM",x:42,y:54},{id:"CM3",pos:"CM",x:58,y:54},{id:"CM4",pos:"CM",x:72,y:52},{id:"RWB",pos:"RB",x:90,y:56},
+    {id:"ST",pos:"ST",x:50,y:18}
+  ]
+};
+
+// Position constraints per slot id per formation
+// pos = what position category this slot accepts
+// We derive COMPAT dynamically from the active formation's slot pos values
+var SLOT_NAMES_MAP={
+  GK:"Goalkeeper",LB:"Left Back",RB:"Right Back",LWB:"Left Wing Back",RWB:"Right Wing Back",
+  CB1:"Centre Back",CB2:"Centre Back",CB3:"Centre Back",
+  CDM:"Def. Mid",CDM1:"Def. Mid",CDM2:"Def. Mid",
+  LM:"Left Mid",RM:"Right Mid",
+  CM:"Central Mid",CM1:"Central Mid",CM2:"Central Mid",CM3:"Central Mid",CM4:"Central Mid",
+  CAM:"Att. Mid",
+  LW:"Left Wing",RW:"Right Wing",
+  ST:"Striker",ST1:"Striker",ST2:"Striker"
+};
+
+// What player positions each slot position accepts
+var SLOT_ACCEPTS={
+  GK:["GK"],
+  LB:["LB"],LWB:["LB"],
+  RB:["RB"],RWB:["RB"],
+  CB:["CB"],
+  CM:["CM","LM","RM"],
+  LM:["LM","LW","CM"],
+  RM:["RM","RW","CM"],
+  LW:["LW","LM"],
+  RW:["RW","RM"],
+  ST:["ST"]
+};
+
+var SP=["Alisson","Van Dijk","Ramos","Terry","Chiellini","Hummels","Robertson","Roberto Carlos","Cafu","Lahm","Modric","Kroos","Xavi","Gerrard","Lampard","Pirlo","De Bruyne","Mane","Ribery","Salah","Ronaldo","Bale","Lewandowski","Benzema","Henry","Ibrahimovic","Shearer","Suarez"];
+
+// - STATE -
+var hideR=true,spinning=false,picks=[],usedIds=[],usedPlayerNames=[],rerolls=1,curSquad=null,filtPlayers=[],simSt={};
+var curFormation="4-3-3";
+var SLOTS=FORMATIONS[curFormation];
+
+// - HELPERS -
+function R(a){return a[Math.floor(Math.random()*a.length)];}
+function avail(){return SQUADS.filter(function(s){return usedIds.indexOf(s.id)===-1;});}
+function emptySlotIds(){var f=picks.map(function(p){return p.slotId;});return SLOTS.filter(function(s){return f.indexOf(s.id)===-1;}).map(function(s){return s.id;});}
+function teamR(){if(!picks.length)return 0;return Math.round(picks.reduce(function(a,b){return a+b.player.rating;},0)/picks.length);}
+function ge(id){return document.getElementById(id);}
+function sh(id){ge(id).classList.remove("hidden");}
+function hi(id){ge(id).classList.add("hidden");}
+
+function compatSlotsForPlayer(ppos){
+  var ei=emptySlotIds(),res=[];
+  ei.forEach(function(sid){
+    var slot=SLOTS.filter(function(s){return s.id===sid;})[0];
+    if(!slot)return;
+    var accepts=SLOT_ACCEPTS[slot.pos]||[slot.pos];
+    if(ppos.some(function(pp){return accepts.indexOf(pp)!==-1;})) res.push(sid);
+  });
+  return res;
+}
+
+// - FORMATION PICKER -
+function buildFormationPicker(){
+  var wrap=ge("formation-wrap");
+  if(!wrap)return;
+  wrap.innerHTML=Object.keys(FORMATIONS).map(function(f){
+    return "<button class='form-btn"+(f===curFormation?" active":"")+"' data-f='"+f+"'>"+f+"</button>";
+  }).join("");
+  wrap.querySelectorAll(".form-btn").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      if(picks.length>0)return; // lock once picks started
+      wrap.querySelectorAll(".form-btn").forEach(function(b){b.classList.remove("active");});
+      this.classList.add("active");
+      curFormation=this.getAttribute("data-f");
+      SLOTS=FORMATIONS[curFormation];
+      renderPitch();
+    });
+  });
+}
+
+// - RATINGS TOGGLE -
+ge("tog-hide").addEventListener("change",function(){
+  hideR=this.checked;
+  if(curSquad)renderList(curSquad);
+  updateBS();
+  if(picks.length>=11)showTRB();
+});
+
+// - ROLL -
+ge("btn-roll").addEventListener("click",function(){
+  var a=avail();if(!a.length)return;
+  spinning=true;this.disabled=true;sh("sm-wrap");hi("pick-wrap");
+  spinClub(a,function(chosenClub){
+    var clubSquads=a.filter(function(s){return s.club===chosenClub;});
+    if(!clubSquads.length)clubSquads=a;
+    spinEra(clubSquads,function(){land(clubSquads);});
+  });
+});
+
+function spinClub(pool,done){
+  var t=ge("sm-ct"),v=ge("sm-cv");
+  t.classList.add("spin");
+  var clubs=[];pool.forEach(function(s){if(clubs.indexOf(s.club)===-1)clubs.push(s.club);});
+  var ticks=0,total=14,lastClub="";
+  var iv=setInterval(function(){
+    ticks++;lastClub=R(clubs);v.textContent=lastClub;
+    if(ticks>=total){
+      clearInterval(iv);t.classList.remove("spin");
+      done(lastClub);
+    }
+  },40);
+}
+
+function spinEra(clubSquads,done){
+  var t=ge("sm-et"),v=ge("sm-ev");
+  t.classList.add("spin");
+  var ticks=0,total=18;
+  var iv=setInterval(function(){
+    ticks++;v.textContent=R(clubSquads).era;
+    if(ticks>=total){clearInterval(iv);t.classList.remove("spin");done();}
+  },40);
+}
+
+function spinR(which,pool,done){
+  var clubs=[];pool.forEach(function(s){if(clubs.indexOf(s.club)===-1)clubs.push(s.club);});
+  var t=ge(which==="c"?"sm-ct":"sm-et"),v=ge(which==="c"?"sm-cv":"sm-ev");
+  t.classList.add("spin");
+  var ticks=0,total=which==="c"?14:18;
+  var iv=setInterval(function(){
+    ticks++;v.textContent=which==="c"?R(clubs):R(pool).era;
+    if(ticks>=total){clearInterval(iv);t.classList.remove("spin");done();}
+  },40);
+}
+
+function land(pool){
+  var sq=R(pool);curSquad=sq;
+  ge("sm-cv").textContent=sq.club;
+  ge("sm-ev").textContent=sq.era;
+  ge("rr-left").textContent=rerolls;
+  ge("btn-rrc").disabled=rerolls<=0;ge("btn-rre").disabled=rerolls<=0;
+  spinning=false;
+  setTimeout(function(){activeFilt="ALL";sh("pick-wrap");ge("pick-wrap").classList.add("fadein");renderList(sq);},250);
+}
+
+ge("btn-rrc").addEventListener("click",function(){
+  if(rerolls<=0||spinning)return;rerolls--;
+  ge("btn-rrc").disabled=true;ge("btn-rre").disabled=true;hi("pick-wrap");
+  // Try same era first, different club
+  var sameEra=avail().filter(function(s){return s.club!==curSquad.club&&s.era===curSquad.era;});
+  var pool=sameEra.length?sameEra:avail().filter(function(s){return s.club!==curSquad.club;});
+  if(!pool.length)pool=avail();
+  spinClub(pool,function(chosenClub){
+    var clubSquads=pool.filter(function(s){return s.club===chosenClub;});
+    if(!clubSquads.length)clubSquads=pool;
+    spinEra(clubSquads,function(){land(clubSquads);});
+  });
+});
+
+ge("btn-rre").addEventListener("click",function(){
+  if(rerolls<=0||spinning)return;rerolls--;
+  ge("btn-rrc").disabled=true;ge("btn-rre").disabled=true;hi("pick-wrap");
+  // Era reroll: keep current club, spin only a new era
+  var sc=avail().filter(function(s){return s.club===curSquad.club&&s.era!==curSquad.era;});
+  if(sc.length){
+    spinEra(sc,function(){land(sc);});
+  } else {
+    // Club has no other eras - spin a whole new club+era
+    var pool=avail().filter(function(s){return s.era!==curSquad.era;});
+    if(!pool.length)pool=avail();
+    spinClub(pool,function(chosenClub){
+      var clubSquads=pool.filter(function(s){return s.club===chosenClub;});
+      if(!clubSquads.length)clubSquads=pool;
+      spinEra(clubSquads,function(){land(clubSquads);});
+    });
+  }
+});
+
+// - PLAYER LIST -
+function renderList(sq){
+  if(!sq)return;
+  var fe=ge("pos-filter");
+  // Filter buttons based on what slots are still empty in this formation
+  var emptySlotPosNeeded={};
+  emptySlotIds().forEach(function(sid){
+    var slot=SLOTS.filter(function(s){return s.id===sid;})[0];
+    if(slot)emptySlotPosNeeded[slot.pos]=true;
+  });
+  // Which player positions can still play?
+  var playablePlayerPos={};
+  sq.players.forEach(function(p){
+    p.pos.forEach(function(pp){
+      if(compatSlotsForPlayer([pp]).length>0) playablePlayerPos[pp]=true;
+    });
+  });
+  var allPos=["GK","LB","CB","RB","CM","LM","RM","LW","RW","ST"];
+  var fps=["ALL"].concat(allPos.filter(function(p){return playablePlayerPos[p];}));
+  fe.innerHTML=fps.map(function(p){return "<button class='pos-btn"+(p==="ALL"?" active":"")+"' data-pos='"+p+"'>"+p+"</button>";}).join("");
+  fe.querySelectorAll(".pos-btn").forEach(function(b){
+    b.addEventListener("click",function(){
+      fe.querySelectorAll(".pos-btn").forEach(function(x){x.classList.remove("active");});
+      this.classList.add("active");renderFilteredList(sq,this.getAttribute("data-pos"));
+    });
+  });
+  renderFilteredList(sq,"ALL");
+}
+
+function renderFilteredList(sq,filt){
+  var le=ge("plist");
+  var pl=sq.players;
+  if(filt!=="ALL"){
+    var cf={LM:["LM","LW"],RM:["RM","RW"],LW:["LW","LM"],RW:["RW","RM"],CM:["CM"]};
+    var show=cf[filt]||[filt];
+    pl=pl.filter(function(p){return p.pos.some(function(x){return show.indexOf(x)!==-1;});});
+  }
+  filtPlayers=pl;
+  le.innerHTML=pl.map(function(p,i){
+    var cs=compatSlotsForPlayer(p.pos);
+    var isDupe=usedPlayerNames.indexOf(p.name)!==-1;
+    var ok=cs.length>0&&!isDupe;
+    var rc=hideR?"pi-rat hr":"pi-rat";
+    var tg=p.pos.map(function(x){return "<span class='pt'>"+x+"</span>";}).join("");
+    return "<div class='pi"+(ok?"":" grey")+"' data-i='"+i+"'><div class='pi-num'>"+(i+1)+"</div><div class='pi-name'>"+p.name+"</div><div class='pi-pos'>"+tg+"</div><div class='"+rc+"'>"+p.rating+"</div></div>";
+  }).join("");
+  le.querySelectorAll(".pi:not(.grey)").forEach(function(el){
+    el.addEventListener("click",function(){onPick(parseInt(this.getAttribute("data-i"),10));});
+  });
+}
+
+function onPick(i){
+  var p=filtPlayers[i];if(!p)return;
+  var cs=compatSlotsForPlayer(p.pos);if(!cs.length)return;
+  if(cs.length===1){assign(p,cs[0]);return;}
+  openPP(p,cs);
+}
+
+// - POSITION PICKER -
+function openPP(p,cs){
+  ge("pp-name").textContent=p.name;
+  ge("pp-info").textContent=curSquad.club+" - "+curSquad.era+(hideR?"":" - Rating "+p.rating);
+  var sl=ge("pp-slots");sl.innerHTML="";
+  cs.forEach(function(sid){
+    var slot=SLOTS.filter(function(s){return s.id===sid;})[0];
+    var btn=document.createElement("button");btn.className="pp-slot";
+    btn.innerHTML="<div class='pp-slot-l'><div class='pp-badge'>"+slot.pos+"</div><div>"+(SLOT_NAMES_MAP[sid]||slot.pos)+"</div></div><div>&#8594;</div>";
+    btn.addEventListener("click",(function(s,pl){return function(){assign(pl,s);closePP();};})(sid,p));
+    sl.appendChild(btn);
+  });
+  sh("pp-ov");
+}
+function closePP(){hi("pp-ov");}
+ge("pp-close").addEventListener("click",closePP);
+ge("pp-ov").addEventListener("click",function(e){if(e.target===this)closePP();});
+
+// - ASSIGN -
+function assign(player,slotId){
+  picks.push({slotId:slotId,player:player,squad:curSquad});
+  usedIds.push(curSquad.id);
+  usedPlayerNames.push(player.name);
+  hi("sm-wrap");hi("pick-wrap");
+  ge("btn-roll").disabled=false;
+  ge("picks-cnt").textContent=picks.length;
+  // Lock formation buttons once first pick made
+  if(picks.length===1){
+    var fbtns=document.querySelectorAll(".form-btn");
+    fbtns.forEach(function(b){b.disabled=true;b.style.opacity="0.4";});
+  }
+  renderPitch();updateBS();
+  if(picks.length>=11){
+    ge("btn-roll").style.display="none";
+    sh("sim-ready");ge("sim-ready").classList.add("fadein");
+    // Auto show ratings when team is complete
+    ge("tog-hide").checked=false;hideR=false;updateBS();showTRB();
+    renderSquadList();
+  }
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// - PITCH -
+function renderSquadList(){
+  var el=ge("squad-list");
+  if(!el)return;
+  var maxR=picks.length?Math.max.apply(null,picks.map(function(p){return p.player.rating;})):0;
+  var ordered=SLOTS.map(function(slot){return picks.filter(function(p){return p.slotId===slot.id;})[0];}).filter(Boolean);
+  el.innerHTML=ordered.map(function(p){
+    var slot=SLOTS.filter(function(s){return s.id===p.slotId;})[0];
+    var isStar=p.player.rating===maxR;
+    var pct=Math.round((p.player.rating-65)/(98-65)*100);
+    pct=Math.max(0,Math.min(100,pct));
+    return "<div class='sq-row'>"
+      +"<div class='sq-pos'>"+slot.pos+"</div>"
+      +"<div class='sq-name'>"+(isStar?"&#9733; ":"")+p.player.name+"</div>"
+      +"<div class='sq-club'>"+p.squad.club+" "+p.squad.era+"</div>"
+      +"<div class='sq-rat'>"+p.player.rating+"</div>"
+      +"</div>";
+  }).join("");
+  sh("squad-list-wrap");
+}
+
+
+function renderPitch(){
+  var pitch=ge("pitch");
+  pitch.querySelectorAll(".slot").forEach(function(el){el.remove();});
+  SLOTS.forEach(function(slot){
+    var pick=picks.filter(function(p){return p.slotId===slot.id;})[0];
+    var el=document.createElement("div");el.className="slot"+(pick?" filled":"");
+    el.style.left=slot.x+"%";el.style.top=slot.y+"%";
+    if(pick){var pts=pick.player.name.split(" ");var isStar=picks.length>=11&&pick.player.rating===Math.max.apply(null,picks.map(function(x){return x.player.rating;}));var nm=(pts.length>1?pts[pts.length-1]:pts[0]);el.innerHTML="<div class='sc'>"+(isStar?"&#9733; ":"")+nm+"</div><div class='sl'>"+pick.squad.era.slice(2,4)+(isStar?" &#9733;":"")+"</div>";}
+    else{el.innerHTML="<div class='sc'>"+slot.pos+"</div><div class='sl'>"+slot.pos+"</div>";}
+    pitch.appendChild(el);
+  });
+}
+
+function updateBS(){
+  var atk=picks.filter(function(p){return p.player.pos.some(function(x){return["LW","RW","ST","LM","RM"].indexOf(x)!==-1;});});
+  var def=picks.filter(function(p){return p.player.pos.some(function(x){return["GK","LB","CB","RB"].indexOf(x)!==-1;});});
+  var mid=picks.filter(function(p){return p.player.pos.some(function(x){return x==="CM";});});
+  function avg(a){return a.length?Math.round(a.reduce(function(x,b){return x+b.player.rating;},0)/a.length):null;}
+  function upd(id,lbl,arr){var el=ge(id),a=avg(arr);if(arr.length){el.classList.add("on");el.innerHTML="<div class='dot'></div>"+lbl+(a&&!hideR?" <strong style='margin-left:3px'>"+a+"</strong>":"");}else{el.classList.remove("on");el.innerHTML="<div class='dot'></div>"+lbl;}}
+  upd("bs-atk","Attack",atk);upd("bs-def","Defense",def);upd("bs-mid","Midfield",mid);
+}
+
+function showTRB(){
+  var avg=teamR(),v=ge("trb-val"),b=ge("trb-bar");
+  if(hideR){v.classList.add("hr");v.textContent="?";}
+  else{v.classList.remove("hr");v.textContent=avg;setTimeout(function(){b.style.width=Math.min(100,Math.max(0,(avg-65)/(98-65)*100))+"%";},100);}
+}
+
+// - SIMULATION -
+ge("btn-sim").addEventListener("click",function(){
+  hi("phase-build");sh("phase-sim");window.scrollTo({top:0});
+  simSt={q:[],res:[],groupGames:[],gp:0,out:false,outAt:null,or:teamR(),gf:0,ga:0,w:0,d:0,l:0,cs:0};
+  simSt.groupOpps=[];
+  for(var i=0;i<8;i++){simSt.groupOpps.push(getOpp());simSt.q.push({t:"g",n:i+1,opp:simSt.groupOpps[i]});}
+  nxtGame();
+});
+
+function getOpp(){var pool=SQUADS.filter(function(s){return usedIds.indexOf(s.id)===-1;});return pool.length?R(pool):R(SQUADS);}
+
+function nxtGame(){
+  ge("sim-nxt").classList.add("hidden");ge("sim-ev").innerHTML="";
+  var sc=ge("sim-sc");sc.textContent="0 - 0";sc.className="sim-sc draw";sc.style.display="";
+  ge("sim-ev").style.maxHeight="";
+  if(!simSt.q.length){showRes();return;}
+  var game=simSt.q.shift();simSt.cur=game;
+  if(game.t==="g"){ge("sim-rl").textContent="League Phase";ge("sim-vs").textContent="Game "+game.n+" of 8 - vs "+game.opp.club+" "+game.opp.era;ge("sim-opp").textContent=game.opp.club+" '"+game.opp.era.slice(2,4);hi("sim-agg");}
+  else if(game.t==="k1"){ge("sim-rl").textContent=game.rd;ge("sim-vs").textContent="Leg 1 (Away) - vs "+game.opp.club+" "+game.opp.era;ge("sim-opp").textContent=game.opp.club+" '"+game.opp.era.slice(2,4);hi("sim-agg");}
+  else if(game.t==="k2"){ge("sim-rl").textContent=game.rd;ge("sim-vs").textContent="Leg 2 (Home) - vs "+game.opp.club;ge("sim-opp").textContent=game.opp.club+" '"+game.opp.era.slice(2,4);sh("sim-agg");ge("sim-agg-v").textContent=game.l1.us+"-"+game.l1.them;}
+  else if(game.t==="et"){ge("sim-rl").textContent=game.rd+" - Extra Time";ge("sim-vs").textContent="AET vs "+game.opp.club;ge("sim-opp").textContent=game.opp.club+" '"+game.opp.era.slice(2,4);sh("sim-agg");ge("sim-agg-v").textContent=game.agg.us+"-"+game.agg.them;}
+  else if(game.t==="pens"){showPenalties(game);return;}
+  else if(game.t==="f"){ge("sim-rl").textContent="THE FINAL";ge("sim-vs").textContent="vs "+game.opp.club+" "+game.opp.era;ge("sim-opp").textContent=game.opp.club+" '"+game.opp.era.slice(2,4);hi("sim-agg");}
+  else if(game.t==="fet"){ge("sim-rl").textContent="FINAL - Extra Time";ge("sim-vs").textContent="AET vs "+game.opp.club;ge("sim-opp").textContent=game.opp.club+" '"+game.opp.era.slice(2,4);hi("sim-agg");}
+  else if(game.t==="fpens"){showPenalties(game);return;}
+  playM(game);
+}
+
+// - MATCH DATA -
+function simD(or,opr,oppSquad,isET,redCardUs,redCardThem,isHome){
+  // ET is shorter: fewer goals
+  var sw=isET?4:8,homeAdj=isHome?2:(isHome===false?-2:0),oE=or+(Math.random()*sw*2-sw)+homeAdj,opE=(opr*0.98)+(Math.random()*sw*2-sw)-homeAdj;
+  // Red cards affect strength
+  if(redCardUs)oE-=8;if(redCardThem)opE-=8;
+  var d=oE-opE;
+  var us=0,th=0;
+  if(d>10){us=Math.floor(Math.random()*3)+1;th=Math.max(0,us-Math.floor(Math.random()*3));}
+  else if(d>3){us=Math.random()>.20?Math.floor(Math.random()*2)+1:0;if(Math.random()>.55)th=Math.max(0,us-1);if(us>=2&&Math.random()>.6)th=Math.min(th+1,us-1);}
+  else if(d<-10){th=Math.floor(Math.random()*3)+1;us=Math.max(0,th-Math.floor(Math.random()*3));}
+  else if(d<-3){th=Math.random()>.20?Math.floor(Math.random()*2)+1:0;if(Math.random()>.55)us=Math.max(0,th-1);}
+  else{if(Math.random()<0.10){us=0;th=0;}else{us=Math.floor(Math.random()*3);th=Math.floor(Math.random()*3);if(us===0&&th===0){if(Math.random()>.5)us=1;else th=1;}}}
+
+  // Outfield scorers
+  // Weighted scorer pool: attackers more likely, defenders less
+  var ourAtk=[],ourMid=[],ourDef=[];
+  picks.forEach(function(p){
+    if(p.slotId==="GK")return;
+    var nm=p.player.name.split(" ").pop();
+    var pos=p.player.pos[0];
+    if(["ST","LW","RW","LM","RM"].indexOf(pos)!==-1){ourAtk.push(nm);ourAtk.push(nm);ourAtk.push(nm);}
+    else if(pos==="CM"){ourMid.push(nm);ourMid.push(nm);}
+    else{ourDef.push(nm);}
+  });
+  var ourOut=ourAtk.concat(ourMid).concat(ourDef);
+  if(!ourOut.length)ourOut=picks.map(function(p){return p.player.name.split(" ").pop();});
+  var oppAtk=[],oppMid=[],oppDef2=[];
+  if(oppSquad&&oppSquad.players){
+    oppSquad.players.forEach(function(p){
+      if(p.pos[0]==="GK")return;
+      var nm=p.name.split(" ").pop();
+      if(["ST","LW","RW","LM","RM"].indexOf(p.pos[0])!==-1){oppAtk.push(nm);oppAtk.push(nm);oppAtk.push(nm);}
+      else if(p.pos[0]==="CM"){oppMid.push(nm);oppMid.push(nm);}
+      else{oppDef2.push(nm);}
+    });
+  }
+  var oppPool=(oppAtk.concat(oppMid).concat(oppDef2)).length?(oppAtk.concat(oppMid).concat(oppDef2)):SP;
+
+  var um=[],tm=[],evs=[];
+  var tMin=isET?91:1,tMax=isET?120:90;
+  for(var i=0;i<us;i++)um.push(Math.floor(Math.random()*(tMax-tMin+1))+tMin);
+  for(var j=0;j<th;j++)tm.push(Math.floor(Math.random()*(tMax-tMin+1))+tMin);
+  um.sort(function(a,b){return a-b;});tm.sort(function(a,b){return a-b;});
+
+  var all=um.map(function(m){return{m:m,u:true,t:"goal"};}).concat(tm.map(function(m){return{m:m,u:false,t:"goal"};}));
+  // 1 drama event: post (85%) or red card (15%)
+  var isRed=Math.random()<0.15;
+  var forUs=Math.random()>0.5;
+  var dMin=isET?91:1,dMax=isET?119:85;
+  all.push({m:Math.floor(Math.random()*(dMax-dMin+1))+dMin,u:forUs,t:isRed?"red":"post"});
+  all.sort(function(a,b){return a.m-b.m;});
+
+  // Track if red card was issued (affects subsequent play)
+  var redUs=false,redThem=false;
+  all.forEach(function(e){
+    var n=e.u?R(ourOut):R(oppPool);
+    if(e.t==="goal")evs.push({m:e.m,i:"Goal",txt:n+" scores!",u:e.u});
+    else if(e.t==="red"){evs.push({m:e.m,i:"Red",txt:n+" - RED CARD!",u:e.u});if(e.u)redUs=true;else redThem=true;}
+    else evs.push({m:e.m,i:"Post",txt:n+" hits the post!",u:e.u});
+  });
+  return{us:us,them:th,result:us>th?"win":us<th?"loss":"draw",events:evs,redUs:redUs,redThem:redThem};
+}
+
+// - PLAY MATCH -
+function playM(game){
+  var isHome=game.t==="k2"||game.t==="et"?true:(game.t==="k1"?false:null);
+  // Progressive difficulty: opponents get stronger deeper in tournament
+  var stageMult=game.t==="g"?1.0:game.rd==="Round of 16"?1.02:game.rd==="Quarter-Final"?1.04:game.rd==="Semi-Final"?1.06:(game.t==="f"||game.t==="fet"||game.t==="fpens")?1.08:1.04;
+  var scaledOpp=Math.round(game.opp.rating*stageMult);
+  var md=simD(simSt.or,scaledOpp,game.opp,game.t==="et"||game.t==="fet",game.redUs,game.redThem,isHome);
+  game.result=md;
+  var su=0,st=0,ei=0,evs=md.events;
+  // For leg2/ET, start from agg display
+  if(game.t==="k2"||game.t==="et"){
+    su=0;st=0; // show this leg's score
+  }
+  function step(){
+    if(ei>=evs.length){su=md.us;st=md.them;updSc(su,st);setTimeout(function(){resolveM(game);},600);return;}
+    var ev=evs[ei++];
+    if(ev.i==="Goal"){if(ev.u)su++;else st++;updSc(su,st);}
+    if(game.t==="et"||game.t==="fet"){
+      // Update agg display live during ET
+      var baseUs=game.agg?game.agg.us:0,baseThem=game.agg?game.agg.them:0;
+      ge("sim-agg-v").textContent=(baseUs+su)+"-"+(baseThem+st);
+    }
+    addEv(ev);
+    ge("sim-ev").scrollTop=ge("sim-ev").scrollHeight;
+    setTimeout(step,ei===evs.length?600:900);
+  }
+  step();
+}
+
+function updSc(u,t){var el=ge("sim-sc");el.textContent=u+" - "+t;el.className="sim-sc "+(u>t?"win":u<t?"loss":"draw");}
+
+function addEv(ev){
+  var d=document.createElement("div");d.className="ev";
+  var ico=ev.i==="Goal"?"&#9917;":ev.i==="Red"?"&#128997;":"<span style='display:inline-block;width:13px;height:13px;border:2px solid #64748b;border-radius:2px;vertical-align:middle'></span>";
+  var cls="ev-txt"+(ev.u===false?" them":"");
+  d.innerHTML="<div class='ev-min'>"+ev.m+"'</div><div class='ev-ico'>"+ico+"</div><div class='"+cls+"'>"+ev.txt+"</div>";
+  ge("sim-ev").appendChild(d);
+}
+
+function setNxt(lbl,fn){var b=ge("sim-nxt");b.textContent=lbl;b.onclick=fn;b.classList.remove("hidden");}
+
+// - PENALTIES -
+function showPenalties(game){
+  ge("sim-rl").textContent=game.t==="fpens"?"FINAL - Penalties":"Penalty Shootout";
+  ge("sim-vs").textContent="vs "+game.opp.club;
+  ge("sim-opp").textContent=game.opp.club+" '"+game.opp.era.slice(2,4);
+  ge("sim-sc").style.display="";
+  ge("sim-sc").textContent="0 - 0";
+  ge("sim-sc").className="sim-sc draw";
+  hi("sim-agg");
+  ge("sim-nxt").classList.add("hidden");
+
+  var ourTakers=picks.filter(function(p){return p.slotId!=="GK";}).map(function(p){return p.player.name.split(" ").pop();});
+  var oppTakers=[];
+  if(game.opp&&game.opp.players){oppTakers=game.opp.players.filter(function(p){return p.pos[0]!=="GK";}).map(function(p){return p.name.split(" ").pop();});}
+  if(!oppTakers.length)oppTakers=SP;
+  var ourAdv=simSt.or>=(game.opp.rating||80)?0.05:0;
+
+  // Pre-simulate
+  var penEvs=[];
+  for(var r=0;r<5;r++){
+    penEvs.push({r:r,pOur:Math.random()<(0.80+ourAdv),pOpp:Math.random()<0.70,ourN:R(ourTakers),oppN:R(oppTakers)});
+  }
+  var s1=0,s2=0;
+  penEvs.forEach(function(e){if(e.pOur)s1++;if(e.pOpp)s2++;});
+  var sdEvs=[];
+  if(s1===s2){
+    for(var sd=0;sd<8;sd++){
+      var sdOur=Math.random()<(0.80+ourAdv),sdOpp=Math.random()<0.70;
+      sdEvs.push({r:5+sd,pOur:sdOur,pOpp:sdOpp,ourN:R(ourTakers),oppN:R(oppTakers),sd:true});
+      if(sdOur!==sdOpp)break;
+    }
+  }
+  var allPens=penEvs.concat(sdEvs);
+
+  // Build scorecard UI in sim-ev area
+  ge("sim-ev").style.maxHeight="none";
+  ge("sim-ev").innerHTML="<div id='pen-card' style='padding:12px 14px;'></div><div id='pen-log' style='padding:0 14px 10px;font-size:12px;color:var(--muted);min-height:24px;'></div>";
+
+  function renderCard(su,so,upTo){
+    var card=ge("pen-card");
+    var rows=[
+      {label:"Your XI",scores:allPens.slice(0,upTo).map(function(e){return e.pOur;})},
+      {label:game.opp.club+" '"+game.opp.era.slice(2,4),scores:allPens.slice(0,upTo).map(function(e){return e.pOpp;})}
+    ];
+    var html="<table style='width:100%;border-collapse:collapse;'>";
+    rows.forEach(function(row,ri){
+      html+="<tr style='border-bottom:"+(ri===0?"1px solid var(--border)":"none")+"'>";
+      html+="<td style='font-size:11px;font-weight:700;color:"+(ri===0?"var(--accent2)":"var(--muted)")+";padding:8px 8px 8px 0;white-space:nowrap;width:80px'>"+row.label+"</td>";
+      // 5 standard spots + SD spots
+      var maxSlots=Math.max(5,allPens.length);
+      for(var i=0;i<maxSlots;i++){
+        var isDone=i<row.scores.length;
+        var isSD=i>=5;
+        var scored=isDone?row.scores[i]:null;
+        var ico=isDone?(scored?"&#9899;":"&#10006;"):"&#9898;";
+        var col=isDone?(scored?"#22c55e":"#ef4444"):"rgba(255,255,255,0.2)";
+        var border=isSD?"border-left:1px dashed var(--border);":"";
+        html+="<td style='text-align:center;padding:8px 4px;"+border+"'><span style='font-size:20px;color:"+col+"'>"+ico+"</span></td>";
+      }
+      // Score total
+      html+="<td style='font-family:Bebas Neue,cursive;font-size:22px;text-align:right;padding:8px 0 8px 8px;color:"+(ri===0?"var(--accent2)":"var(--muted)")+"'>"+(ri===0?su:so)+"</td>";
+      html+="</tr>";
+    });
+    html+="</table>";
+    card.innerHTML=html;
+  }
+
+  // Animate pen by pen
+  var su=0,so=0,pi=0;
+  function nextPen(){
+    if(pi>=allPens.length){
+      var won=su>so;
+      updSc(su,so);
+      ge("pen-log").textContent=won?"You win the shootout!":"You lose the shootout.";
+      ge("pen-log").style.color=won?"var(--green)":"var(--red)";
+      var penNote=" (Pens)";
+      simSt.res.push({t:game.t==="fpens"?"fr":"agg",won:won,agg:game.agg,pen:penNote,rd:game.rd||"Final",opp:game.opp,md:{us:game.agg?game.agg.us:0,them:game.agg?game.agg.them:0}});
+      if(!won){simSt.out=true;simSt.outAt=game.rd||"Final";}
+      if(game.t==="fpens"){simSt.res[simSt.res.length-1].t="fr";simSt.res[simSt.res.length-1].won=won;}
+      setTimeout(function(){setNxt(won?"NEXT ROUND":"SEE RESULTS",won?nxtGame:showRes);},800);
+      return;
+    }
+    var pe=allPens[pi++];
+    if(pe.pOur)su++;if(pe.pOpp)so++;
+    renderCard(su,so,pi);
+    updSc(su,so);
+    // Show taker name
+    var takerLine=(pe.pOur?"&#9917; "+pe.ourN+(pe.pOur?" scores":""  ):"&#10006; "+pe.ourN+" misses")
+      +(pe.sd?" (SD)":"");
+    ge("pen-log").innerHTML=takerLine+" | "+(pe.pOpp?"&#9917; "+pe.oppN+" scores":"&#10006; "+pe.oppN+" misses");
+    ge("pen-log").style.color="var(--muted)";
+    setTimeout(nextPen,900);
+  }
+  renderCard(0,0,0);
+  nextPen();
+}
+
+
+// - RESOLVE MATCH -
+function resolveM(game){
+  var res=game.result;
+
+  // Track stats
+  if(game.t==="g"||game.t==="k1"||game.t==="k2"||game.t==="f"||game.t==="et"||game.t==="fet"){
+    simSt.gf+=res.us;simSt.ga+=res.them;
+    if(res.them===0)simSt.cs++;
+    if(res.result==="win")simSt.w++;else if(res.result==="draw")simSt.d++;else simSt.l++;
+  }
+
+  if(game.t==="g"){
+    if(res.result==="win")simSt.gp+=3;else if(res.result==="draw")simSt.gp+=1;
+    simSt.groupGames.push(game);
+    var done=simSt.groupGames.length;
+    if(done>=8){
+      var rows=buildGroupTable(simSt.groupGames);
+      showGroupStandings(rows,simSt.gp,function(){
+        var q=simSt.gp>=12; // raise bar: need 12pts (4 wins) to auto-qualify, 9-11 = playoff zone, <9 = out
+        // Actually use position: top 8 qualify
+        var ourRow=rows.filter(function(r){return r.us;})[0];
+        var ourPos=rows.indexOf(ourRow);
+        if(ourPos>=8){simSt.out=true;simSt.outAt="League Phase";showRes();}
+        else{
+          ["Round of 16","Quarter-Final","Semi-Final"].forEach(function(r){simSt.q.push({t:"k1",rd:r,opp:getOpp()});});
+          simSt.q.push({t:"f",opp:getOpp()});
+          nxtGame();
+        }
+      });
+    }else{setNxt("NEXT GAME",nxtGame);}
+
+  }else if(game.t==="k1"){
+    simSt.res.push(game);
+    simSt.q.unshift({t:"k2",rd:game.rd,opp:game.opp,l1:res,redUs:res.redUs,redThem:res.redThem});
+    sh("sim-agg");ge("sim-agg-v").textContent=res.us+"-"+res.them;
+    setNxt("LEG 2",nxtGame);
+
+  }else if(game.t==="k2"){
+    var agg={us:game.l1.us+res.us,them:game.l1.them+res.them};
+    ge("sim-agg-v").textContent=agg.us+"-"+agg.them;
+    if(agg.us>agg.them){
+      simSt.res.push({t:"agg",agg:agg,thru:true,rd:game.rd,opp:game.opp,pen:""});
+      setNxt("NEXT ROUND",nxtGame);
+    }else if(agg.us<agg.them){
+      simSt.res.push({t:"agg",agg:agg,thru:false,rd:game.rd,opp:game.opp,pen:""});
+      simSt.out=true;simSt.outAt=game.rd;setNxt("SEE RESULTS",showRes);
+    }else{
+      // Level on agg - play ET
+      simSt.q.unshift({t:"et",rd:game.rd,opp:game.opp,agg:agg,redUs:res.redUs,redThem:res.redThem});
+      setNxt("EXTRA TIME",nxtGame);
+    }
+
+  }else if(game.t==="et"){
+    var newAgg={us:game.agg.us+res.us,them:game.agg.them+res.them};
+    ge("sim-agg-v").textContent=newAgg.us+"-"+newAgg.them;
+    if(newAgg.us>newAgg.them){
+      simSt.res.push({t:"agg",agg:newAgg,thru:true,rd:game.rd,opp:game.opp,pen:" (AET)"});
+      setNxt("NEXT ROUND",nxtGame);
+    }else if(newAgg.us<newAgg.them){
+      simSt.res.push({t:"agg",agg:newAgg,thru:false,rd:game.rd,opp:game.opp,pen:" (AET)"});
+      simSt.out=true;simSt.outAt=game.rd;setNxt("SEE RESULTS",showRes);
+    }else{
+      simSt.q.unshift({t:"pens",rd:game.rd,opp:game.opp,agg:newAgg});
+      setNxt("PENALTIES",nxtGame);
+    }
+
+  }else if(game.t==="f"){
+    if(res.result==="win"){
+      simSt.res.push({t:"fr",won:true,pen:"",opp:game.opp,md:res});
+      setNxt("SEE RESULTS",showRes);
+    }else if(res.result==="loss"){
+      simSt.res.push({t:"fr",won:false,pen:"",opp:game.opp,md:res});
+      simSt.out=true;simSt.outAt="Final";setNxt("SEE RESULTS",showRes);
+    }else{
+      // Draw in final - go to ET
+      simSt.q.unshift({t:"fet",rd:"Final",opp:game.opp,agg:{us:res.us,them:res.them},redUs:res.redUs,redThem:res.redThem});
+      setNxt("EXTRA TIME",nxtGame);
+    }
+
+  }else if(game.t==="fet"){
+    var fAgg={us:game.agg.us+res.us,them:game.agg.them+res.them};
+    if(fAgg.us!==fAgg.them){
+      var fWon=fAgg.us>fAgg.them;
+      simSt.res.push({t:"fr",won:fWon,pen:" (AET)",opp:game.opp,md:{us:fAgg.us,them:fAgg.them}});
+      if(!fWon){simSt.out=true;simSt.outAt="Final";}
+      setNxt("SEE RESULTS",showRes);
+    }else{
+      simSt.q.unshift({t:"fpens",rd:"Final",opp:game.opp,agg:fAgg});
+      setNxt("PENALTIES",nxtGame);
+    }
+  }
+}
+
+// - GROUP TABLE -
+function buildGroupTable(ourGames){
+  // 36-team format: simulate 35 other teams
+  var rows=[{name:"Your XI",us:true,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}];
+  var oppNames=simSt.groupOpps.map(function(o){return o.club+" '"+o.era.slice(2,4);});
+  // Add 27 more simulated teams to reach 36
+  var extraTeams=[];
+  var extraPool=SQUADS.filter(function(s){return usedIds.indexOf(s.id)===-1;});
+  for(var e=0;e<27;e++){
+    var sq=extraPool.length?extraPool[Math.floor(Math.random()*extraPool.length)]:R(SQUADS);
+    extraTeams.push(sq.club+" '"+sq.era.slice(2,4));
+  }
+  var allOtherNames=oppNames.concat(extraTeams);
+  allOtherNames.forEach(function(n){rows.push({name:n,us:false,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});});
+
+  // Fill our row from real games
+  ourGames.forEach(function(g){
+    var r=g.result;rows[0].p++;rows[0].gf+=r.us;rows[0].ga+=r.them;
+    if(r.result==="win"){rows[0].w++;rows[0].pts+=3;}
+    else if(r.result==="draw"){rows[0].d++;rows[0].pts+=1;}
+    else rows[0].l++;
+  });
+
+  // Simulate all other teams (each plays 8 games vs random opponents)
+  for(var i=1;i<rows.length;i++){
+    var p=0,w=0,d=0,l=0,gf=0,ga=0,pts=0;
+    for(var g2=0;g2<8;g2++){
+      var gf2=Math.floor(Math.random()*3),ga2=Math.floor(Math.random()*3);
+      p++;gf+=gf2;ga+=ga2;
+      if(gf2>ga2){w++;pts+=3;}else if(gf2<ga2){l++;}else{d++;pts+=1;}
+    }
+    rows[i].p=p;rows[i].w=w;rows[i].d=d;rows[i].l=l;rows[i].gf=gf;rows[i].ga=ga;rows[i].pts=pts;
+  }
+
+  rows.sort(function(a,b){if(b.pts!==a.pts)return b.pts-a.pts;return(b.gf-b.ga)-(a.gf-a.ga);});
+  return rows;
+}
+
+function showGroupStandings(rows,ourPts,onDone){
+  ge("sim-rl").textContent="League Phase - Final Standings";
+  ge("sim-vs").textContent="";
+  ge("sim-sc").style.display="";
+  ge("sim-sc").textContent="0 - 0";
+  ge("sim-sc").className="sim-sc draw";
+  hi("sim-agg");ge("sim-ev").innerHTML="";
+
+  var ourRow=rows.filter(function(r){return r.us;})[0];
+  var ourPos=rows.indexOf(ourRow)+1;
+  var qualified=ourPos<=8;
+
+  ge("sim-vs").textContent=qualified?"Finished "+ordinal(ourPos)+" - QUALIFIED":"Finished "+ordinal(ourPos)+" - ELIMINATED";
+
+  var html="<div style='padding:4px 0'>";
+  html+="<div style='display:grid;grid-template-columns:20px 1fr 20px 20px 20px 20px 24px;gap:0 4px;padding:5px 14px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border)'><div>#</div><div>Team</div><div style='text-align:center'>P</div><div style='text-align:center'>W</div><div style='text-align:center'>D</div><div style='text-align:center'>L</div><div style='text-align:center'>Pts</div></div>";
+
+  // Show top 12 + our row if outside top 12
+  var showRows=rows.slice(0,12);
+  if(ourPos>12)showRows.push(null,ourRow); // separator then our row
+
+  showRows.forEach(function(r,i){
+    if(!r){html+="<div style='padding:4px 14px;font-size:9px;color:var(--muted);letter-spacing:1px'>...</div>";return;}
+    var pos=rows.indexOf(r)+1;
+    var isUs=r.us;
+    var q8=pos<=8;
+    var bg=isUs?"rgba(37,99,235,0.18)":q8?"rgba(255,255,255,0.02)":"rgba(0,0,0,0.15)";
+    var border=isUs?"border-left:3px solid var(--accent2)":"border-left:3px solid transparent";
+    html+="<div style='display:grid;grid-template-columns:20px 1fr 20px 20px 20px 20px 24px;gap:0 4px;padding:7px 14px;border-bottom:1px solid rgba(255,255,255,0.04);background:"+bg+";"+border+";align-items:center'>";
+    html+="<div style='font-family:Bebas Neue,cursive;font-size:13px;color:"+(q8?"var(--gold)":"var(--muted)")+"'>"+pos+"</div>";
+    html+="<div style='font-size:11px;font-weight:"+(isUs?"700":"500")+";color:"+(isUs?"var(--accent2)":"var(--text)")+";overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+r.name+"</div>";
+    ["p","w","d","l"].forEach(function(k){html+="<div style='font-size:11px;text-align:center;color:var(--muted)'>"+r[k]+"</div>";});
+    html+="<div style='font-size:12px;font-weight:700;text-align:center;color:"+(isUs?"var(--accent2)":"var(--text)")+"'>"+r.pts+"</div>";
+    html+="</div>";
+    if(pos===8&&rows[8]&&rows[8].pts!==r.pts){html+="<div style='border-top:1px dashed var(--border);margin:0 14px'></div>";}
+  });
+  html+="<div style='padding:6px 14px;font-size:9px;color:var(--muted);letter-spacing:1px'>TOP 8 QUALIFY FOR KNOCKOUTS</div></div>";
+  ge("sim-ev").innerHTML=html;
+  ge("sim-ev").style.maxHeight="380px";
+
+  setNxt(qualified?"KNOCKOUT ROUNDS":"SEE RESULTS",function(){
+    ge("sim-sc").style.display="";ge("sim-ev").style.maxHeight="";
+    onDone();
+  });
+}
+
+function ordinal(n){var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
+
+// - RESULTS -
+
+function genSummary(or,won,outAt,gf,ga,cs,w,d,l,gp,starPick){
+  var lines=[];
+  var total=w+d+l;
+  var gd=gf-ga;
+  var gdStr=(gd>0?"+":"")+gd;
+  var starName=starPick?starPick.player.name.split(" ").pop():"";
+
+  // Line 1: what happened, honest and direct
+  if(won){
+    if(or>=90) lines.push("A squad of this calibre delivering the trophy. Expected, but still earned.");
+    else if(or>=86) lines.push("Champions of Europe. On paper they had the tools - they proved it.");
+    else lines.push("Nobody had them as favourites. They won it anyway.");
+  } else if(outAt==="League Phase"){
+    // Always means they didn't make top 8 - no ambiguity
+    if(gp>=15) lines.push("Plenty of points but not enough. The group phase table was brutal.");
+    else if(gp>=12) lines.push("A solid group campaign wasn't enough to squeeze into the top eight.");
+    else if(or>=87) lines.push("A rating of "+or+" and out before the knockouts. This shouldn't have happened.");
+    else lines.push("Eliminated in the group stage. Didn't do enough when it counted.");
+  } else if(outAt==="Round of 16"){
+    if(or>=88) lines.push("Got through the groups comfortably, then came unstuck in the last sixteen.");
+    else lines.push("Made it to the knockouts, fell at the first hurdle. A run to build on.");
+  } else if(outAt==="Quarter-Final"){
+    lines.push("Quarter-finals. Respectable. The last eight of Europe is not nothing.");
+  } else if(outAt==="Semi-Final"){
+    lines.push("A semi-final. Agonisingly close. One more win and it would have been a different story.");
+  } else if(outAt==="Final"){
+    lines.push("Runners-up. They made the final and fell short. The hurt will linger.");
+  } else {
+    lines.push("The campaign is over.");
+  }
+
+  // Line 2: the record, always factual
+  lines.push(w+"W "+d+"D "+l+"L. "+gf+" scored, "+ga+" conceded ("+gdStr+"). "+cs+" clean sheet"+(cs===1?"":"s")+".");
+
+  // Line 3: one honest observation from the stats - only if there's something to say
+  if(!won){
+    if(l>=5) lines.push("Five losses or more. The defence was the problem.");
+    else if(d>=4) lines.push("Too many draws. A team that should have turned more into wins.");
+    else if(gf<ga) lines.push("Conceded more than they scored. That combination rarely ends well.");
+    else if(cs>=4) lines.push("Kept things tight at the back. Just couldn't get the goals to match.");
+    else if(gf>=12) lines.push("Goals weren't the issue. Something else let them down.");
+  } else {
+    if(cs>=5) lines.push("Solid at both ends. Goals scored, goals kept out.");
+    else if(gf>=18) lines.push("Goals flowed throughout. An attack that didn't know when to stop.");
+    else if(l===0) lines.push("Unbeaten all the way through. A clean sweep.");
+  }
+
+  // Line 4: star player - italic gold, always last
+  if(starPick){
+    if(won) lines.push(starName+" ("+starPick.player.rating+") was the best player on the pitch. Justified every pick.");
+    else lines.push(starName+" ("+starPick.player.rating+") deserved more from this tournament.");
+  }
+
+  return lines;
+}
+
+function showRes(){
+  hi("phase-sim");sh("phase-res");window.scrollTo({top:0});
+  ge("sim-sc").style.display="";ge("sim-ev").style.maxHeight="";
+  var or=teamR(),won=simSt.res.some(function(r){return r.t==="fr"&&r.won;}),html="";
+
+  // Record
+  var totalW=simSt.w,totalD=simSt.d,totalL=simSt.l;
+  // Add KO wins/losses/draws from results
+  simSt.res.forEach(function(r){
+    if(r.t==="g")return;
+    if(r.t==="agg"||r.t==="fr"){
+      if(r.thru||r.won)totalW++;else totalL++;
+    }
+  });
+
+  if(won){
+    setTimeout(launchConfetti,300);
+    var tEl=ge("cl-trophy-tpl");
+    html+="<div class=\'trophy fadein\'><div class=\'trophy-ico\'>"+(tEl?tEl.innerHTML:"&#127942;")+"</div><div class=\'trophy-ttl\'>Champions of Europe</div><div class=\'trophy-sub\'>"+(hideR?"":"Rating "+or+" &bull; ")+simSt.gf+" goals scored &bull; "+simSt.ga+" conceded</div></div>";
+  }else{
+    html+="<div class='rc fadein' style='margin-bottom:10px'><div class='rh'><span>Your Run</span><span style='color:var(--red)'>Eliminated - "+(simSt.outAt||"League Phase")+"</span></div><div style='padding:12px 14px'>";
+    html+="<div style='font-family:Bebas Neue,cursive;font-size:22px;color:var(--muted)'>So Close...</div>";
+    html+="<div style='font-size:12px;color:var(--muted);margin-top:6px'>"+(hideR?"":"Rating "+or+" &bull; ")+simSt.gf+" scored &bull; "+simSt.ga+" conceded</div>";
+    html+="</div></div>";
+  }
+
+  // True record
+  // Your XI in slot order
+  html+="<div class='rc' style='margin-bottom:10px'><div class='rh'><span>Your XI</span></div>";
+  var ordered=SLOTS.map(function(slot){return picks.filter(function(p){return p.slotId===slot.id;})[0];}).filter(Boolean);
+  ordered.forEach(function(p){
+    var slot=SLOTS.filter(function(s){return s.id===p.slotId;})[0];
+    var isStar=p.player.rating===Math.max.apply(null,picks.map(function(x){return x.player.rating;}));html+="<div class='pi' style='cursor:default'><div class='pi-num' style='color:var(--accent2)'>"+slot.pos+"</div><div class='pi-name'>"+(isStar?"&#9733; ":"")+p.player.name+"</div><div class='pi-pos'><span class='pt' style=\'color:var(--muted)\'>"+p.squad.club+" "+p.squad.era+"</span></div>"+(hideR?"":"<div class='pi-rat'>"+p.player.rating+"</div>")+"</div>";
+  });
+  html+="</div>";
+
+  // Group games
+  var gg=simSt.res.filter(function(r){return r.t==="g";});
+  if(gg.length){
+    var gp=simSt.gp;
+    html+="<div class='rc'><div class='rh'><span>League Phase</span><span>"+gp+" pts</span></div>";
+    gg.forEach(function(g){var sc=g.result.result;html+="<div class='rr'><div class='rt us'>Your XI</div><div class='rs "+sc+"'>"+g.result.us+" - "+g.result.them+"</div><div class='rt' style='text-align:right'>"+g.opp.club+"<br><span style='font-size:10px;color:var(--muted)'>"+g.opp.era+"</span></div></div>";});
+    html+="</div>";
+  }
+
+  // Knockouts
+  simSt.res.filter(function(r){return r.t==="agg"||r.t==="fr";}).forEach(function(r){
+    if(r.t==="agg"){
+      html+="<div class='rc'><div class='rh'><span>"+r.rd+"</span><span style='color:"+(r.thru?"var(--green)":"var(--red)")+"'>"+(r.thru?"THROUGH":"ELIMINATED")+(r.pen||"")+"</span></div><div class='rr'><div class='rt us'>Your XI</div><div class='rs "+(r.thru?"win":"loss")+"'>"+r.agg.us+" - "+r.agg.them+(r.pen||"")+"</div><div class='rt' style=\'text-align:right\'>"+r.opp.club+"</div></div></div>";
+    }else if(r.t==="fr"){
+      html+="<div class='rc'><div class='rh'><span>Final</span><span style='color:"+(r.won?"var(--gold)":"var(--red)")+"'>"+(r.won?"CHAMPIONS":"Runners Up")+(r.pen||"")+"</span></div><div class='rr'><div class='rt us'>Your XI</div><div class='rs "+(r.won?"win":"loss")+"'>"+r.md.us+" - "+r.md.them+(r.pen||"")+"</div><div class='rt' style=\'text-align:right\'>"+r.opp.club+"</div></div></div>";
+    }
+  });
+  // Full record at end
+  var recStr=simSt.w+"W "+simSt.d+"D "+simSt.l+"L &bull; "+simSt.gf+" GF "+simSt.ga+" GA &bull; "+simSt.cs+" clean sheet"+(simSt.cs===1?"":"s");
+  // Campaign summary
+  var starPick2=picks.length?picks.reduce(function(a,b){return b.player.rating>a.player.rating?b:a;},picks[0]):null;
+  var summaryLines=genSummary(or,won,simSt.outAt,simSt.gf,simSt.ga,simSt.cs,simSt.w,simSt.d,simSt.l,simSt.gp,starPick2);
+  html+="<div class='rc summary-card' style='margin-bottom:10px'>";
+  html+="<div class='rh'><span>The Verdict</span></div>";
+  html+="<div style='padding:14px'>";
+  summaryLines.forEach(function(line,i){
+    if(i===0) html+="<div style='font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4'>"+line+"</div>";
+    else if(i===summaryLines.length-1) html+="<div style='font-size:12px;color:var(--gold);font-style:italic;margin-top:8px;line-height:1.4'>"+line+"</div>";
+    else html+="<div style='font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4'>"+line+"</div>";
+  });
+  html+="</div></div>";
+    html+="<div class='rc' style='margin-bottom:10px'><div class='rh'><span>Full Record</span>"+(hideR?"":"<span style='color:var(--muted)'>Avg "+or+"</span>")+"</div><div style='padding:10px 14px;font-size:12px;color:var(--muted)'>"+recStr+"</div></div>";
+  ge("res-content").innerHTML=html;
+
+}
+
+// - RESET -
+ge("btn-reset").addEventListener("click",function(){
+  picks=[];usedIds=[];usedPlayerNames=[];rerolls=1;curSquad=null;filtPlayers=[];simSt={};spinning=false;
+  curFormation="4-3-3";SLOTS=FORMATIONS[curFormation];
+  sh("phase-build");hi("phase-sim");hi("phase-res");hi("sm-wrap");hi("pick-wrap");hi("sim-ready");
+  ge("btn-roll").disabled=false;ge("btn-roll").style.display="";ge("picks-cnt").textContent="0";
+  ge("res-content").innerHTML="";ge("sim-ev").innerHTML="";ge("trb-bar").style.width="0%";
+  hi("squad-list-wrap");if(ge("squad-list"))ge("squad-list").innerHTML="";
+  ge("sim-sc").style.display="";ge("sim-ev").style.maxHeight="";
+  ge("tog-hide").checked=false;hideR=false;
+  // Re-enable formation buttons
+  document.querySelectorAll(".form-btn").forEach(function(b){b.disabled=false;b.style.opacity="";});
+  buildFormationPicker();
+  renderPitch();updateBS();window.scrollTo({top:0});
+});
+
+// - CONFETTI -
+function launchConfetti(){
+  var colors=["#f5c518","#2563eb","#22c55e","#ef4444","#f59e0b","#fff","#93c5fd"];
+  for(var i=0;i<80;i++){
+    (function(i){
+      setTimeout(function(){
+        var el=document.createElement("div");
+        el.className="confetti-piece";
+        el.style.left=Math.random()*100+"vw";
+        el.style.background=colors[Math.floor(Math.random()*colors.length)];
+        el.style.width=(6+Math.random()*8)+"px";
+        el.style.height=(6+Math.random()*8)+"px";
+        el.style.animationDuration=(1.5+Math.random()*2)+"s";
+        el.style.animationDelay="0s";
+        document.body.appendChild(el);
+        setTimeout(function(){el.remove();},4000);
+      },i*30);
+    })(i);
+  }
+}
+
+
+// - INIT -
+buildFormationPicker();
+renderPitch();
+
+})();
+</script>
+</body>
+</html>
